@@ -1,0 +1,8 @@
+repository: 'https://github.com/rendinam/astroconda-contrib'
+numpy_version: 1.11
+packages:
+  - verhawk
+#  - costools
+  - INTENTIONALLY_INVALID
+#  - acstools
+
