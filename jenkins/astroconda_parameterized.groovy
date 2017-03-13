@@ -14,7 +14,7 @@
 //      Constants controlling the behavior of this script:
 //
 // Where to obtain this file and the manifest files
-this.build_control_URL = "https://github.com/rendinam/build_control"
+this.build_control_URL = "https://github.com/astroconda/build_control"
 
 // The conda version shown in the conda_installers list below is installed
 // first, then the version is forced to this value. 
