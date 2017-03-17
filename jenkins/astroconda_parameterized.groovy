@@ -58,8 +58,6 @@ node(this.label) {
 
     this.BUILD_SUBDIR = "${this.release_type}/${this.py_version}"
     this.BUILD_ROOT = "${env.WORKSPACE}/${this.BUILD_SUBDIR}"
-    currentBuild.displayName = 
-        "${this.release_type}-${this.OSname}-${this.py_version}-${this.label}"
 
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
