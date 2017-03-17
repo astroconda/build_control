@@ -1,6 +1,6 @@
 repository: 'https://github.com/astroconda/astroconda-contrib'
 numpy_version: 1.11
 packages:
-  - relic
   - verhawk
+  - INTENTIONALLY_INVALID
 
