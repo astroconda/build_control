@@ -28,6 +28,7 @@ packages:
   - fitsverify
   - ginga
   - glueviz
+  - glue-core
   - glue-vispy-viewers
   - glue-ginga
   - gwcs

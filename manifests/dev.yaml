@@ -29,6 +29,7 @@ packages:
   - fitsblender
   - ginga
   - glueviz
+  - glue-core
   - glue-vispy-viewers
   - gwcs
   - hstcal
