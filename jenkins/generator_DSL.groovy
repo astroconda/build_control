@@ -18,7 +18,7 @@ folder(suite_name)
 // Generate the dispatch job that will trigger the chain of package
 // build jobs.
 
-pipelineJob("${suite_name}/dispatch") {
+pipelineJob("${suite_name}/_dispatch") {
     println("label = ${label}")
     println("manifest_file = ${manifest_file}")
     println("py_version = ${py_version}")
