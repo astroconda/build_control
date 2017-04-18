@@ -60,7 +60,7 @@ node(LABEL) {
         println("PY_VERSION = ${PY_VERSION}")
         assert PY_VERSION != null
         assert PY_VERSION != "py_version-DEFAULTVALUE"
-        this.py_maj_version = "${PY_VERSION.split.(".")[0]}"
+        this.py_maj_version = "${PY_VERSION.split(".")[0]}"
 
         // Inherited from env() assignment performed in the generator
         // DSL script.
