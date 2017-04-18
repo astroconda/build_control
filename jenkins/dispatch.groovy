@@ -60,7 +60,7 @@ node(LABEL) {
         println("PY_VERSION = ${PY_VERSION}")
         assert PY_VERSION != null
         assert PY_VERSION != "py_version-DEFAULTVALUE"
-        this.py_maj_version = "${PY_VERSION.split(".")[0]}"
+        this.py_maj_version = "${PY_VERSION.tokenize(".")[0]}"
 
         // Inherited from env() assignment performed in the generator
         // DSL script.
@@ -80,7 +80,7 @@ node(LABEL) {
         def dl_cmd = null
         def stat1 = 999
         for (cmd in dl_cmds) {
-            stat1 = sh(script: "which ${cmd.split()[0]}", returnStatus: true)
+            stat1 = sh(script: "which ${cmd.tokenize()[0]}", returnStatus: true)
             if( stat1 == 0 ) {
                 dl_cmd = cmd
                 break
