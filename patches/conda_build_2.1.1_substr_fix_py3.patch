@@ -1,0 +1,11 @@
+--- config.py.ORIG	2017-04-18 08:08:06.000000000 -0400
++++ config.py	2017-04-18 08:08:20.000000000 -0400
+@@ -327,7 +327,7 @@
+             assert not os.path.isabs(package_name), ("package name should not be a absolute path, "
+                                                      "to preserve croot during path joins")
+             build_folders = sorted([build_folder for build_folder in get_build_folders(self.croot)
+-                                if package_name in build_folder])
++                                if package_name + "_" in build_folder])
+ 
+             if self.dirty and build_folders:
+                 # Use the most recent build with matching recipe name

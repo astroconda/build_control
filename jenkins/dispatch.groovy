@@ -30,11 +30,11 @@ node(LABEL) {
     if (uname == "Darwin") {
         this.OSname = "MacOSX"
         env.PATH = "${env.PATH}:/sw/bin"
-        this.CONDA_BLD_OUTPUT_DIR = "osx-64"
+        this.CONDA_PLATFORM = "osx-64"
     }
     if (uname == "Linux") {
         this.OSname = uname
-        this.CONDA_BLD_OUTPUT_DIR = "linux-64"
+        this.CONDA_PLATFORM = "linux-64"
     }
     assert uname != null
 
@@ -47,7 +47,7 @@ node(LABEL) {
     // Allow for sharing build_list between stages below.
     this.build_list = []
 
-    stage('Setup') {
+    stage("Setup") {
 
         // Inherited from env() assignment performed in the generator
         // DSL script.
@@ -60,12 +60,15 @@ node(LABEL) {
         println("PY_VERSION = ${PY_VERSION}")
         assert PY_VERSION != null
         assert PY_VERSION != "py_version-DEFAULTVALUE"
+        this.py_maj_version = "${PY_VERSION.split.(".")[0]}"
 
         // Inherited from env() assignment performed in the generator
         // DSL script.
         println("MANIFEST_FILE = ${MANIFEST_FILE}")
         assert MANIFEST_FILE != null
         assert MANIFEST_FILE != "manifest_file-DEFAULTVALUE"
+
+        println("PATH = ${env.PATH}")
 
         // Fetch the manifest files
         git url: this.build_control_URL
@@ -95,15 +98,26 @@ node(LABEL) {
 
         // Run miniconda installer and then force to particular version
         sh "bash ./${conda_installer} -b -p miniconda"
-        env.PATH = "${env.WORKSPACE}/miniconda/bin/:" + "${env.PATH}"
+        env.PATH = "${env.WORKSPACE}/miniconda/bin/:${env.PATH}"
         sh "conda install --quiet conda=${this.conda_version}"
         sh "conda install --quiet --yes conda-build=${this.conda_build_version}"
 
+        // Apply bugfix patch to conda_build 2.1.1
+        def patches_dir = "${env.WORKSPACE}/patches"
+        def patch = "${patches_dir}/conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
+        dir("miniconda/lib/python${PY_VERSION}/site-packages/conda/conda_build") {
+            sh "patch ${patch}"
+        }
+
         this.manifest = readYaml file: "manifests/" +
             this.manifest_file
+        if (this.manifest.channel_URL == '/') {
+            this.manifest.channel_URL = this.manifest.channel_URL[0..-2]
+        }
         println("Manifest repository: ${this.manifest.repository}")
         println("Manifest numpy version specification: " +
             "${this.manifest.numpy_version}")
+        println("Manifest channel_URL: ${this.manifest.channel_URL}")
         println("Manifest packages to build:")
         for (pkgname in this.manifest.packages) {
             println(pkgname)
@@ -113,43 +127,43 @@ node(LABEL) {
         dir(this.recipes_dir) {
             git url: this.manifest.repository
         }
-
-        // Retrieve recipe management tools
-
-
     }
 
     stage("Generate build list") {
-        // Call in Rambo.
+        // Obtain build utilities
         dir(this.utils_dir) {
             git url: this.utils_URL
         }
 
-        // Generate a dependency-ordered list of available package recipes.
-        cmd = "${this.utils_dir}/rambo.py --ordered ${this.recipes_dir}"
-        ordered_available =
-            sh(script: cmd, returnStdout: true).trim().tokenize()
-
-        // Compose the ordered union of the list of available recipes and the
-        // actual build manifest.
-        build_list = []
-        for (pkg in ordered_available) {
-            if (pkg in this.manifest.packages) {
-                build_list.push(pkg)
-            }
+        // Generate a filtered, culled, & dependency-ordered list of available
+        // package recipes.
+        def blist_file = "build_list"
+        cmd = "${this.utils_dir}/rambo.py"
+        args = ["--platform ${this.CONDA_PLATFORM}",
+                "--manifest manifests/${this.manifest_file}",
+                "--file ${blist_file}",
+                "--culled",
+                this.recipes_dir]
+        for (arg in args) {
+            cmd = "${cmd} ${arg}"
         }
+        sh(script: cmd)
+
+        def blist_text = readFile blist_file
+        def build_list = blist_text.trim().tokenize()
         println("Build list:")
         println(build_list)
     }
 
-    stage('Build packages') {
+    stage("Build packages") {
         for (pkg in build_list) {
             build job: pkg,
               parameters:
-                [string(name: 'label', value: env.NODE_NAME),
-                 string(name: 'py_version', value: PY_VERSION),
-                 string(name: 'numpy_version', value: "${this.manifest.numpy_version}"),
-                 string(name: 'parent_workspace', value: env.WORKSPACE)],
+                [string(name: "label", value: env.NODE_NAME),
+                 string(name: "py_version", value: PY_VERSION),
+                 string(name: "numpy_version",
+                        value: "${this.manifest.numpy_version}"),
+                 string(name: "parent_workspace", value: env.WORKSPACE)],
               propagate: false
         }
     }

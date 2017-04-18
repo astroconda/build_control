@@ -1,4 +1,5 @@
 repository: 'https://github.com/astroconda/astroconda-dev'
+channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 numpy_version: 1.11
 packages:
   - stsci.tools
@@ -29,7 +30,7 @@ packages:
   - fitsblender
   - ginga
   - glueviz
-  - glue-core
+#  - glue-core
   - glue-vispy-viewers
   - gwcs
   - hstcal
@@ -37,7 +38,7 @@ packages:
   - imexam
   - jplephem
   - jwst
-  - jwst_coronagraph_visibility
+#  - jwst_coronagraph_visibility
   - jwst_gtvt
   - jwxml
   - mosviz
