@@ -16,10 +16,16 @@ node("master") {
         // These variables are provided by the execution of the generator
         // build task with parameters.  Each var is populated by a parameter
         // specification.
-        sh "echo manifest_file=${this.manifest_file}"
-        sh "echo label=${this.label}"
-        sh "echo py_version=${this.py_version}"
-        sh "echo old_jobs_action=${this.old_jobs_action}"
+        println("manifest_file=${this.manifest_file}")
+        println("label=${this.label}")
+        println("py_version=${this.py_version}")
+        println("build_control_repo=${this.build_control_repo}")
+        println("conda_version=${this.conda_version}")
+        println("conda_build_version=${this.conda_build_version}")
+        println("conda_base_URL=${this.conda_base_URL}")
+        println("utils_repo=${this.utils_repo}")
+
+        println("old_jobs_action=${this.old_jobs_action}")
     }
 
     stage("Setup") {
@@ -34,10 +40,10 @@ node("master") {
         sh "cp -r ${env.WORKSPACE}@script/* ."
     }
 
-    stage('Spawn job definitions') {
-        jobDsl targets: ["jenkins/generator_DSL.groovy"].join('\n'),
+    stage("Spawn job definitions") {
+        jobDsl targets: ["jenkins/generator_DSL.groovy"].join("\n"),
                lookupStrategy: "SEED_JOB",
-               additionalClasspath: ["${this.ldir}/*.jar"].join('\n'),
+               additionalClasspath: ["${this.ldir}/*.jar"].join("\n"),
                removeAction: "${this.old_jobs_action}"
     }
 
