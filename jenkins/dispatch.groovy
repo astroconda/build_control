@@ -75,7 +75,7 @@ node(LABEL) {
         println("PATH = ${env.PATH}")
 
         // Fetch the manifest files
-        git url: BUILD_CONTROL_REPO
+        git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
 
         // Check for the availability of a download tool and then use it
         // to get the conda installer.
@@ -107,11 +107,11 @@ node(LABEL) {
         sh "conda install --quiet --yes conda-build=${CONDA_BUILD_VERSION}"
 
         // Apply bugfix patch to conda_build 2.1.1
+        def filename = "${env.WORKSPACE}/miniconda/lib/python${PY_VERSION}/site-packages/conda_build/config.py"
         def patches_dir = "${env.WORKSPACE}/patches"
-        def patch = "${patches_dir}/conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
-        dir("miniconda/lib/python${PY_VERSION}/site-packages/conda/conda_build") {
-            sh "patch ${patch}"
-        }
+        def patchname = "conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
+        def full_patchname = "${patches_dir}/${patchname}"
+        sh "patch ${filename} ${full_patchname}"
 
         this.manifest = readYaml file: "manifests/${MANIFEST_FILE}"
         if (this.manifest.channel_URL[-1..-1] == "/") {

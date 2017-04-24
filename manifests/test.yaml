@@ -1,6 +1,11 @@
 repository: 'https://github.com/astroconda/astroconda-contrib'
+channel_URL: 'http://ssb.stsci.edu/astroconda'
 numpy_version: 1.11
 packages:
-  - relic
-  - verhawk
-
+  - pyobjc-core
+  - pyobjc-framework-cocoa
+  - pyobjc-framework-quartz
+  - pyqtgraph
+  - pyraf
+  - stsci.tools
+  - d2to1

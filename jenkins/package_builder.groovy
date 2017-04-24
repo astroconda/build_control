@@ -33,6 +33,8 @@ node(this.label) {
                         "--python=${this.py_version}",
                         "--numpy=${this.numpy_version}",
                         "--skip-existing",
+                        "--override-channels",
+                        "--channel defaults",
                         "--dirty"]
                 for (arg in args) {
                     build_cmd = "${build_cmd} ${arg}"
@@ -48,10 +50,8 @@ node(this.label) {
             stage("Test") {
                 build_cmd = cmd
                 args = ["--test",
-                        "--no-anaconda-upload",
                         "--python=${this.py_version}",
-                        "--numpy=${this.numpy_version}",
-                        "--skip-existing"]
+                        "--numpy=${this.numpy_version}"]
                 for (arg in args) {
                     build_cmd = "${build_cmd} ${arg}"
                 }

@@ -48,6 +48,9 @@ packages:
   - purge_path
   - pyds9
   - pyfftw
+  - pyobjc-core
+  - pyobjc-framework-cocoa
+  - pyobjc-framework-quartz
   - pyqtgraph
   - pyraf
   - pyregion
