@@ -1,0 +1,34 @@
+repository: 'https://github.com/astroconda/astroconda-contrib'
+channel_URL: 'http://ssb.stsci.edu/astroconda'
+numpy_version: 1.11
+packages:
+  - stsci-hst
+  - purge_path
+  - acstools
+  - calcos
+  - costools
+  - crds
+  - d2to1
+  - drizzlepac
+  - fitsblender
+  - hstcal
+  - nictools
+  - pyregion
+  - pysynphot
+  - reftools
+  - stistools
+  - stsci.convolve
+  - stsci.distutils
+  - stsci.image
+  - stsci.imagemanip
+  - stsci.imagestats
+  - stsci.ndimage
+  - stsci.numdisplay
+  - stsci.skypac
+  - stsci.sphere
+  - stsci.sphinxext
+  - stsci.stimage
+  - stsci.tools
+  - stwcs
+  - wfc3tools
+  - wfpc2tools

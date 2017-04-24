@@ -20,6 +20,7 @@ node("master") {
         println("label=${this.label}")
         println("py_version=${this.py_version}")
         println("build_control_repo=${this.build_control_repo}")
+        println("build_control_branch=${this.build_control_branch}")
         println("conda_version=${this.conda_version}")
         println("conda_build_version=${this.conda_build_version}")
         println("conda_base_URL=${this.conda_base_URL}")
