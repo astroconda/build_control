@@ -6,10 +6,12 @@ import org.yaml.snakeyaml.Yaml
 
 def yaml = new Yaml()
 def config = yaml.load(readFileFromWorkspace("manifests/${manifest_file}"))
+def job_def_generation_time = new Date() 
 
 
 //-----------------------------------------------------------------------
 // Create a folder to contain the jobs which are created below.
+
 suite_name = "${manifest_file.tokenize(".")[0]}_${label}_py${py_version}"
 folder(suite_name)
 
@@ -18,7 +20,8 @@ folder(suite_name)
 // Generate the dispatch job that will trigger the chain of package
 // build jobs.
 
-pipelineJob("${suite_name}/_dispatch") {
+this.script = "dispatch.groovy"
+pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     // At trigger-time, allow for setting manifest culling behavior.
     parameters {
         booleanParam("cull_manifest",
@@ -27,16 +30,20 @@ pipelineJob("${suite_name}/_dispatch") {
                      "package file name that already exists in the manfest's" +
                      " channel archive are removed from the build list.")
     }
-    println("MANIFEST_FILE = ${manifest_file}")
-    println("LABEL = ${label}")
-    println("PY_VERSION = ${py_version}")
-    println("BUILD_CONTROL_REPO = ${build_control_repo}")
-    println("BUILD_CONTROL_BRANCH = ${build_control_branch}")
-    println("CONDA_VERSION = ${conda_version}")
-    println("CONDA_BUILD_VERSION = ${conda_build_version}")
-    println("CONDA_BASE_URL = ${conda_base_URL}")
-    println("UTILS_REPO = ${utils_repo}")
+    println("\n" +
+    "script: ${this.script}\n" +
+    "MANIFEST_FILE: ${manifest_file}\n" +
+    "LABEL: ${label}\n" +
+    "PY_VERSION: ${py_version}\n" +
+    "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
+    "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +
+    "CONDA_VERSION: ${conda_version}\n" +
+    "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
+    "CONDA_BASE_URL: ${conda_base_URL}\n" +
+    "UTILS_REPO: ${utils_repo}\n")
     environmentVariables {
+        env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
+        env("SCRIPT", this.script)
         env("MANIFEST_FILE", manifest_file)
         env("LABEL", label)
         env("PY_VERSION", py_version)
@@ -49,7 +56,7 @@ pipelineJob("${suite_name}/_dispatch") {
     }
     definition {
         cps {
-            script(readFileFromWorkspace("jenkins/dispatch.groovy"))
+            script(readFileFromWorkspace("jenkins/${this.script}"))
             sandbox()
         }
     }
@@ -62,6 +69,9 @@ pipelineJob("${suite_name}/_dispatch") {
 for(pkg in config.packages) {
 
     pipelineJob("${suite_name}/${pkg}") {
+        environmentVariables {
+            env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
+        }
         parameters {
             stringParam("label",
                         "label-DEFAULTVALUE",
