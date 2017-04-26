@@ -2,24 +2,28 @@ node(this.label) {
 
     dir(this.parent_workspace) {
 
-        println("inherited workspace: ${this.parent_workspace}")
-        println("this.Nodelabel: ${this.label}")
-        println("env.JOB_NAME: ${env.JOB_NAME}")
-        println("env.JOB_BASE_NAME: ${env.JOB_BASE_NAME}")
-        println("env.BUILD_NUMBER: ${env.BUILD_NUMBER}")
-        println("env.NODE_NAME: ${env.NODE_NAME}")
-        println("env.WORKSPACE: ${env.WORKSPACE}")
-        println("env.JENKINS_HOME: ${env.JENKINS_HOME}")
-        println(currentBuild.buildVariables)
-        println("parameter py_version: ${this.py_version}")
-
         env.PATH = "${this.parent_workspace}/miniconda/bin/:" + "${env.PATH}"
-        println("PATH: ${env.PATH}")
+        def time = new Date()
+
+        println("\n" +
+        "    Package Build Info Summary:\n" +
+        "${time}\n" +
+        "JOB_DEF_GENERATION_TIME: ${JOB_DEF_GENERATION_TIME}\n" +
+        "inherited workspace: ${this.parent_workspace}\n" +
+        "this.Nodelabel: ${this.label}\n" +
+        "env.JOB_BASE_NAME: ${env.JOB_BASE_NAME}\n" +
+        "env.JOB_NAME: ${env.JOB_NAME}\n" +
+        "env.BUILD_NUMBER: ${env.BUILD_NUMBER}\n" +
+        "env.NODE_NAME: ${env.NODE_NAME}\n" +
+        "env.WORKSPACE: ${env.WORKSPACE}\n" +
+        "env.JENKINS_HOME: ${env.JENKINS_HOME}\n" +
+        "parameter py_version: ${this.py_version}\n" +
+        "PATH: ${env.PATH}\n")
 
         // Make the log files a bit more deterministic
         env.PYTHONUNBUFFERED = "true"
 
-        // In the directory common to all package build jobs, 
+        // In the directory common to all package build jobs,
         // run conda build --dirty for this package to use any existing work
         // directory or source trees already obtained.
         dir("conda-recipes") {

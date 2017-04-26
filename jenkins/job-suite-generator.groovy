@@ -7,6 +7,10 @@
 // groovy classpath definition prior to imports.
 this.ldir = "libs"
 
+// DSL script path within the repository obtained for this job.
+this.dsl_script = "jenkins/generator_DSL.groovy"
+
+
 node("master") {
 
     stage("Prep") {
@@ -16,17 +20,17 @@ node("master") {
         // These variables are provided by the execution of the generator
         // build task with parameters.  Each var is populated by a parameter
         // specification.
-        println("manifest_file=${this.manifest_file}")
-        println("label=${this.label}")
-        println("py_version=${this.py_version}")
-        println("build_control_repo=${this.build_control_repo}")
-        println("build_control_branch=${this.build_control_branch}")
-        println("conda_version=${this.conda_version}")
-        println("conda_build_version=${this.conda_build_version}")
-        println("conda_base_URL=${this.conda_base_URL}")
-        println("utils_repo=${this.utils_repo}")
-
-        println("old_jobs_action=${this.old_jobs_action}")
+        println("manifest_file: ${this.manifest_file}\n" +
+        "label: ${this.label}\n" +
+        "py_version: ${this.py_version}\n" +
+        "build_control_repo: ${this.build_control_repo}\n" +
+        "build_control_branch: ${this.build_control_branch}\n" +
+        "conda_version: ${this.conda_version}\n" +
+        "conda_build_version: ${this.conda_build_version}\n" +
+        "conda_base_URL: ${this.conda_base_URL}\n" +
+        "utils_repo: ${this.utils_repo}\n" +
+        "old_jobs_action: ${this.old_jobs_action}\n" +
+        "dsl_script: ${this.dsl_script}")
     }
 
     stage("Setup") {
@@ -42,7 +46,7 @@ node("master") {
     }
 
     stage("Spawn job definitions") {
-        jobDsl targets: ["jenkins/generator_DSL.groovy"].join("\n"),
+        jobDsl targets: [this.dsl_script].join("\n"),
                lookupStrategy: "SEED_JOB",
                additionalClasspath: ["${this.ldir}/*.jar"].join("\n"),
                removeAction: "${this.old_jobs_action}"
