@@ -3,6 +3,9 @@ node(this.label) {
     dir(this.parent_workspace) {
 
         env.PATH = "${this.parent_workspace}/miniconda/bin/:" + "${env.PATH}"
+        env.PYTHONPATH = ""
+        // Make the log files a bit more deterministic
+        env.PYTHONUNBUFFERED = "true"
         def time = new Date()
 
         println("\n" +
@@ -18,10 +21,9 @@ node(this.label) {
         "env.WORKSPACE: ${env.WORKSPACE}\n" +
         "env.JENKINS_HOME: ${env.JENKINS_HOME}\n" +
         "parameter py_version: ${this.py_version}\n" +
-        "PATH: ${env.PATH}\n")
-
-        // Make the log files a bit more deterministic
-        env.PYTHONUNBUFFERED = "true"
+        "PATH: ${env.PATH}\n" +
+        "PYTHONPATH: ${env.PYTHONPATH}\n" +
+        "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
 
         // In the directory common to all package build jobs,
         // run conda build --dirty for this package to use any existing work

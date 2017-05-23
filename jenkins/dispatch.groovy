@@ -42,6 +42,10 @@ node(LABEL) {
     }
     assert uname != null
 
+    env.PYTHONPATH = ""
+    // Make the log files a bit more deterministic
+    env.PYTHONUNBUFFERED = "true"
+
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
     deleteDir()
@@ -72,12 +76,14 @@ node(LABEL) {
         "OSverion: ${this.OSversion}\n" +
         "script: dispatch.groovy\n" +
         "env.WORKSPACE: ${env.WORKSPACE}\n" +
+        "PATH: ${PATH}\n" +
+        "PYTHONPATH: ${env.PYTHONPATH}\n" +
+        "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n" +
         "  Job suite parameters:\n" +
         "LABEL: ${LABEL}\n" +
         "env.NODE_NAME: ${env.NODE_NAME}\n" +
         "PY_VERSION: ${PY_VERSION}\n" +
         "MANIFEST_FILE: ${MANIFEST_FILE}\n" +
-        "PATH: ${PATH}\n" +
         "CONDA_VERSION: ${CONDA_VERSION}\n" +
         "CONDA_BUILD_VERSION: ${CONDA_BUILD_VERSION}\n" +
         "CONDA_BASE_URL: ${CONDA_BASE_URL}\n" +
