@@ -169,7 +169,7 @@ node(LABEL) {
         // Install support tools
         dir(this.utils_dir) {
             sh "python setup.py install"
-        {
+        }
     }
 
     stage("Generate build list") {
