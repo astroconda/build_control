@@ -124,7 +124,6 @@ node(LABEL) {
         // Get build utilities
         dir(this.utils_dir) {
             git url: UTILS_REPO
-            sh "python setup.py install"
         }
 
         // Check for the availability of a download tool and then use it
@@ -155,7 +154,7 @@ node(LABEL) {
 
         // Install specific versions of miniconda and conda-build
         sh "bash ./${conda_installer} -b -p miniconda"
-        env.PATH = "${env.WORKSPACE}/miniconda/bin/:${env.PATH}"
+        env.PATH = "${env.WORKSPACE}/miniconda/bin:${env.PATH}"
         sh "conda install --quiet conda=${CONDA_VERSION}"
         sh "conda install --quiet --yes conda-build=${CONDA_BUILD_VERSION}"
 
@@ -167,6 +166,8 @@ node(LABEL) {
         def full_patchname = "${patches_dir}/${patchname}"
         sh "patch ${filename} ${full_patchname}"
 
+        // Install support tools
+        sh "python setup.py install"
     }
 
     stage("Generate build list") {
