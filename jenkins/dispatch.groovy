@@ -167,7 +167,9 @@ node(LABEL) {
         sh "patch ${filename} ${full_patchname}"
 
         // Install support tools
-        sh "python setup.py install"
+        dir(this.utils_dir) {
+            sh "python setup.py install"
+        {
     }
 
     stage("Generate build list") {
