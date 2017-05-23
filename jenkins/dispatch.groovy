@@ -118,6 +118,7 @@ node(LABEL) {
         // Get build utilities
         dir(this.utils_dir) {
             git url: UTILS_REPO
+            sh "python setup.py install"
         }
 
         // Check for the availability of a download tool and then use it
@@ -170,7 +171,7 @@ node(LABEL) {
            culled_option = ""
         }
         def build_list_file = "build_list"
-        cmd = "${this.utils_dir}/rambo.py"
+        cmd = "rambo"
         args = ["--platform ${this.CONDA_PLATFORM}",
                 "--python ${PY_VERSION}",
                 "--manifest manifests/${MANIFEST_FILE}",
