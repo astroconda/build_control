@@ -12,7 +12,6 @@ node(this.label) {
         "    Package Build Info Summary:\n" +
         "${time}\n" +
         "JOB_DEF_GENERATION_TIME: ${JOB_DEF_GENERATION_TIME}\n" +
-        "inherited workspace: ${this.parent_workspace}\n" +
         "this.Nodelabel: ${this.label}\n" +
         "env.JOB_BASE_NAME: ${env.JOB_BASE_NAME}\n" +
         "env.JOB_NAME: ${env.JOB_NAME}\n" +
@@ -20,7 +19,11 @@ node(this.label) {
         "env.NODE_NAME: ${env.NODE_NAME}\n" +
         "env.WORKSPACE: ${env.WORKSPACE}\n" +
         "env.JENKINS_HOME: ${env.JENKINS_HOME}\n" +
+        "parameter parent_workspace: ${this.parent_workspace}\n" +
         "parameter py_version: ${this.py_version}\n" +
+        "parameter numpy_version: ${this.numpy_version}\n" +
+        "parameter cull_manifest: ${this.cull_manifest}\n" +
+        "parameter channel_URL: ${this.channel_URL}\n" +
         "PATH: ${env.PATH}\n" +
         "PYTHONPATH: ${env.PYTHONPATH}\n" +
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
@@ -33,6 +36,15 @@ node(this.label) {
             cmd = "conda build"
 
             stage("Build") {
+                // Use channel URL obtained from manifest in build command if
+                // manifest has been culled to allow packages being built to
+                // simply download dependency packages from the publication
+                // channel as needed, rather than build them as part of the
+                // package build session that requires them.
+                def channel_option = "${this.channel_URL}"
+                if (this.cull_manifest == "false") {
+                    channel_option = ""
+                }
                 build_cmd = cmd
                 args = ["--no-test",
                         "--no-anaconda-upload",
@@ -41,6 +53,7 @@ node(this.label) {
                         "--skip-existing",
                         "--override-channels",
                         "--channel defaults",
+                        "${channel_option}",
                         "--dirty"]
                 for (arg in args) {
                     build_cmd = "${build_cmd} ${arg}"
