@@ -42,6 +42,10 @@ node(LABEL) {
     }
     assert uname != null
 
+    env.PYTHONPATH = ""
+    // Make the log files a bit more deterministic
+    env.PYTHONUNBUFFERED = "true"
+
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
     deleteDir()
@@ -72,12 +76,14 @@ node(LABEL) {
         "OSverion: ${this.OSversion}\n" +
         "script: dispatch.groovy\n" +
         "env.WORKSPACE: ${env.WORKSPACE}\n" +
+        "PATH: ${PATH}\n" +
+        "PYTHONPATH: ${env.PYTHONPATH}\n" +
+        "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n" +
         "  Job suite parameters:\n" +
         "LABEL: ${LABEL}\n" +
         "env.NODE_NAME: ${env.NODE_NAME}\n" +
         "PY_VERSION: ${PY_VERSION}\n" +
         "MANIFEST_FILE: ${MANIFEST_FILE}\n" +
-        "PATH: ${PATH}\n" +
         "CONDA_VERSION: ${CONDA_VERSION}\n" +
         "CONDA_BUILD_VERSION: ${CONDA_BUILD_VERSION}\n" +
         "CONDA_BASE_URL: ${CONDA_BASE_URL}\n" +
@@ -148,7 +154,7 @@ node(LABEL) {
 
         // Install specific versions of miniconda and conda-build
         sh "bash ./${conda_installer} -b -p miniconda"
-        env.PATH = "${env.WORKSPACE}/miniconda/bin/:${env.PATH}"
+        env.PATH = "${env.WORKSPACE}/miniconda/bin:${env.PATH}"
         sh "conda install --quiet conda=${CONDA_VERSION}"
         sh "conda install --quiet --yes conda-build=${CONDA_BUILD_VERSION}"
 
@@ -160,6 +166,10 @@ node(LABEL) {
         def full_patchname = "${patches_dir}/${patchname}"
         sh "patch ${filename} ${full_patchname}"
 
+        // Install support tools
+        dir(this.utils_dir) {
+            sh "python setup.py install"
+        }
     }
 
     stage("Generate build list") {
@@ -170,7 +180,7 @@ node(LABEL) {
            culled_option = ""
         }
         def build_list_file = "build_list"
-        cmd = "${this.utils_dir}/rambo.py"
+        cmd = "rambo"
         args = ["--platform ${this.CONDA_PLATFORM}",
                 "--python ${PY_VERSION}",
                 "--manifest manifests/${MANIFEST_FILE}",
