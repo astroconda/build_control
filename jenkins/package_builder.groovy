@@ -41,7 +41,7 @@ node(this.label) {
                 // simply download dependency packages from the publication
                 // channel as needed, rather than build them as part of the
                 // package build session that requires them.
-                def channel_option = "${this.channel_URL}"
+                def channel_option = "--channel ${this.channel_URL}"
                 if (this.cull_manifest == "false") {
                     channel_option = ""
                 }
