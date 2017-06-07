@@ -177,7 +177,7 @@ node(LABEL) {
         // of available package recipes.
         def culled_option = "--culled"
         if (this.cull_manifest == "false") {
-           culled_option = ""
+            culled_option = ""
         }
         def build_list_file = "build_list"
         cmd = "rambo"
@@ -205,7 +205,9 @@ node(LABEL) {
                  string(name: "py_version", value: PY_VERSION),
                  string(name: "numpy_version",
                         value: "${this.manifest.numpy_version}"),
-                 string(name: "parent_workspace", value: env.WORKSPACE)],
+                 string(name: "parent_workspace", value: env.WORKSPACE),
+                 string(name: "cull_manifest", value: this.cull_manifest),
+                 string(name: "channel_URL", value: this.manifest.channel_URL)],
               propagate: false
         }
     }
