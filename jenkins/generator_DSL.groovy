@@ -88,6 +88,12 @@ for(pkg in config.packages) {
             stringParam("manifest_file",
                         "manifest_file-DEFAULTVALUE",
                         "Manifest (release) file to use for the build.")
+            stringParam("cull_manifest",
+                        "cull_manifest-DEFAULTVALUE",
+                        "Was the manifest culled as part of dispatch?")
+            stringParam("channel_URL",
+                        "channel_URL-DEFAULTVALUE",
+                        "Publication channel used for culled builds.")
         }
         definition {
             cps {
