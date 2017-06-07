@@ -1,3 +1,5 @@
+this.build_status_file = "${this.parent_workspace}/propagated_build_status"
+
 node(this.label) {
 
     dir(this.parent_workspace) {
@@ -27,6 +29,8 @@ node(this.label) {
         "PATH: ${env.PATH}\n" +
         "PYTHONPATH: ${env.PYTHONPATH}\n" +
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
+
+        def build_status = readFile this.build_status_file
 
         // In the directory common to all package build jobs,
         // run conda build --dirty for this package to use any existing work
@@ -63,6 +67,11 @@ node(this.label) {
                           returnStatus: true)
                 if (stat != 0) {
                     currentBuild.result = "FAILURE"
+                    // Check if build status file already contains failure
+                    // status. If not, write failure status to the file.
+                    if (build_status != "FAILURE") {
+                        sh "echo FAILURE > ${this.build_status_file}"
+                    }
                 }
             }
 
@@ -79,6 +88,11 @@ node(this.label) {
                           returnStatus: true)
                 if (stat != 0) {
                     currentBuild.result = "UNSTABLE"
+                    // Check if build status file already contains unstable
+                    // status. If not, write unstable status to the file.
+                    if (build_status != "FAILURE") {
+                        sh "echo FAILURE > ${this.build_status_file}"
+                    }
                 }
             }
 

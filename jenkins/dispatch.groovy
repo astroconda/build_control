@@ -15,6 +15,8 @@
 this.utils_dir = "utils"
 this.recipes_dir = "conda-recipes"
 
+this.build_status_file = "propagated_build_status"
+
 // The conda installer script to use for various <OS><py_version> combinations.
 this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_64.sh",
                           "Linux-py3.5":"Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh",
@@ -195,6 +197,10 @@ node(LABEL) {
         this.build_list = build_list_text.trim().tokenize()
         println("Build list:")
         println(build_list_text)
+
+        // Write build status file to facilitate build status propagation
+        // from child jobs.
+        sh "echo SUCCESS > ${this.build_status_file}"
     }
 
     stage("Build packages") {
@@ -210,6 +216,9 @@ node(LABEL) {
                  string(name: "channel_URL", value: this.manifest.channel_URL)],
               propagate: false
         }
+        // Set overall status to that propagated from individual jobs.
+        // This will be the most severe status encountered in all sub jobs.
+        currentBuild.result = readFile this.build_status_file
     }
 }
 
