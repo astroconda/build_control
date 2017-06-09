@@ -21,6 +21,12 @@ folder(suite_name)
 // build jobs.
 
 this.script = "dispatch.groovy"
+
+this.build_control_repo = readFileFromWorkspace("VAR-build_control_repo")
+this.build_control_repo = this.build_control_repo.trim()
+this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
+this.build_control_branch= this.build_control_branch.trim()
+
 pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     // At trigger-time, allow for setting manifest culling behavior.
     parameters {
