@@ -48,6 +48,8 @@ node(LABEL) {
     // Make the log files a bit more deterministic
     env.PYTHONUNBUFFERED = "true"
 
+    sh "printenv"
+
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
     deleteDir()
@@ -208,6 +210,8 @@ node(LABEL) {
             build job: pkg,
               parameters:
                 [string(name: "label", value: env.NODE_NAME),
+                 string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
+                 string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
                  string(name: "py_version", value: PY_VERSION),
                  string(name: "numpy_version",
                         value: "${this.manifest.numpy_version}"),

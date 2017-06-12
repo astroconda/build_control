@@ -82,6 +82,12 @@ for(pkg in config.packages) {
             stringParam("label",
                         "label-DEFAULTVALUE",
                         "The node on which to run.")
+            stringParam("build_control_repo",
+                        "build_control_repo-DEFAULTVALUE",
+                        "Repository containing the build system scripts.")
+            stringParam("build_control_branch",
+                        "build_control_branch-DEFAULTVALUE",
+                        "Branch checked out to obtain build system scripts.")
             stringParam("py_version",
                         "py_version-DEFAULTVALUE",
                         "python version to use")
