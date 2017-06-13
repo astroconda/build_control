@@ -17,6 +17,9 @@ this.dsl_script = "jenkins/generator_DSL.groovy"
 node("master") {
 
     stage("Prep") {
+
+        sh "printenv"
+
         // Delete any existing job workspace directory contents.
         deleteDir()
 
