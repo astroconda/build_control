@@ -1,11 +1,9 @@
 repository: 'https://github.com/astroconda/astroconda-contrib'
 channel_URL: 'http://ssb.stsci.edu/astroconda'
-numpy_version: 1.11
+numpy_version: 1.13
 packages:
-  - pyobjc-core
-  - pyobjc-framework-cocoa
-  - pyobjc-framework-quartz
-  - pyqtgraph
-  - pyraf
-  - stsci.tools
-  - d2to1
+  - mosviz
+  - specutils
+  - glueviz
+  - glue-vispy-viewers
+  - glue-core
