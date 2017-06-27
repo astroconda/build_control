@@ -159,8 +159,8 @@ node(LABEL) {
         // Install specific versions of miniconda and conda-build
         sh "bash ./${conda_installer} -b -p miniconda"
         env.PATH = "${env.WORKSPACE}/miniconda/bin:${env.PATH}"
-        sh "conda install --quiet conda=${CONDA_VERSION} python=${PY_VERSION}"
-        sh "conda install --quiet --yes conda-build=${CONDA_BUILD_VERSION}"
+        def cpkgs = "conda=${CONDA_VERSION} conda-build=${CONDA_BUILD_VERSION}"
+        sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
         // Apply bugfix patch to conda_build 2.1.1 - 2.1.15 - (?)
         def filename = "${env.WORKSPACE}/miniconda/lib/python${PY_VERSION}/" +
