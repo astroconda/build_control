@@ -1,0 +1,31 @@
+repository: 'https://github.com/astroconda/astroconda-contrib'
+channel_URL: 'http://ssb.stsci.edu/astroconda'
+numpy_version: 1.13
+packages:
+  - costools
+  - crds
+  - d2to1
+  - glueviz
+  - glue-core
+  - glue-vispy-viewers
+  - glue-ginga
+  - imexam
+  - jwst_coronagraph_visibility
+  - jwst_gtvt
+  - jwxml
+  - mosviz
+  - pyobjc-core
+  - pyobjc-framework-cocoa
+  - pyobjc-framework-quartz
+  - pyqtgraph
+  - pytools
+  - pywcs
+  - reftools
+  - selenium
+  - shunit2
+  - specviz
+  - specutils
+  - sphere
+  
+  
+  
