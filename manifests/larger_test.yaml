@@ -7,6 +7,7 @@ packages:
   - glue-core
   - glue-vispy-viewers
   - glue-ginga
+  - ginga
   - mosviz
   - pyobjc-core
   - pyobjc-framework-cocoa
