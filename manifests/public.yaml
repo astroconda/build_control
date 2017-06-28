@@ -1,6 +1,6 @@
 repository: 'https://github.com/astroconda/astroconda-contrib'
 channel_URL: 'http://ssb.stsci.edu/astroconda'
-numpy_version: 1.11
+numpy_version: 1.13
 packages:
   - stsci.tools
   - stsci.imagestats
