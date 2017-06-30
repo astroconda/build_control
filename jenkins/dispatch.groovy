@@ -222,7 +222,9 @@ node(LABEL) {
         }
         // Set overall status to that propagated from individual jobs.
         // This will be the most severe status encountered in all sub jobs.
-        currentBuild.result = readFile this.build_status_file
+        def tmp_status = readFile this.build_status_file
+        tmp_status = tmp_status.trim()
+        currentBuild.result = tmp_status
     }
 }
 
