@@ -35,6 +35,7 @@ node(this.label) {
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
 
         def build_status = readFile this.build_status_file
+        build_status = build_status.trim()
 
         // In the directory common to all package build jobs,
         // run conda build --dirty for this package to use any existing work
@@ -71,10 +72,10 @@ node(this.label) {
                           returnStatus: true)
                 if (stat != 0) {
                     currentBuild.result = "FAILURE"
-                    // Check if build status file already contains failure
-                    // status. If not, write failure status to the file.
+                    // Ratchet up the overall build status severity if this
+                    // is the most severe seen so far.
                     if (build_status != "FAILURE") {
-                        sh "echo FAILURE > ${this.build_status_file}"
+                            sh "echo ${currentBuild.result} > ${this.build_status_file}"
                     }
                 }
             }
@@ -92,10 +93,10 @@ node(this.label) {
                           returnStatus: true)
                 if (stat != 0) {
                     currentBuild.result = "UNSTABLE"
-                    // Check if build status file already contains unstable
-                    // status. If not, write unstable status to the file.
-                    if (build_status != "FAILURE") {
-                        sh "echo FAILURE > ${this.build_status_file}"
+                    // Ratchet up the overall build status severity if this
+                    // is the most severe seen so far.
+                    if (build_status == "SUCCESS") {
+                        sh "echo ${currentBuild.result} > ${this.build_status_file}"
                     }
                 }
             }
