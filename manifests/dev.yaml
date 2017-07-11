@@ -1,6 +1,6 @@
 repository: 'https://github.com/astroconda/astroconda-dev'
 channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
-numpy_version: 1.11
+numpy_version: 1.13
 packages:
   - stsci.tools
   - stsci.imagestats
@@ -30,7 +30,7 @@ packages:
   - fitsblender
   - ginga
   - glueviz
-#  - glue-core
+  - glue-core
   - glue-vispy-viewers
   - gwcs
   - hstcal
@@ -38,7 +38,7 @@ packages:
   - imexam
   - jplephem
   - jwst
-#  - jwst_coronagraph_visibility
+  - jwst_coronagraph_visibility
   - jwst_gtvt
   - jwxml
   - mosviz
@@ -50,6 +50,9 @@ packages:
   - purge_path
   - pyds9
   - pyfftw
+  - pyobjc-core
+  - pyobjc-framework-cocoa
+  - pyobjc-framework-quartz
   - pyqtgraph
   - pyraf
   - pyregion
@@ -63,7 +66,7 @@ packages:
   - shunit2
   - specviz
   - specutils
-  - sphere
+  - spherical-geometry
   - sphinx_rtd_theme
   - sphinxcontrib-programoutput
   - stginga
