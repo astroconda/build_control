@@ -162,11 +162,11 @@ node(LABEL) {
         def cpkgs = "conda=${CONDA_VERSION} conda-build=${CONDA_BUILD_VERSION}"
         sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
-        // Apply bugfix patch only to conda_build 2.1.1 - 2.1.15 - (?)
+        // Apply bugfix patch only to conda_build 2.x
         def conda_build_version = sh(script: "conda-build --version", returnStdout: true)
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
-        println("conda_build_maj_ver = ${conda_build_maj_ver}")
         if (conda_build_maj_ver == "2") {
+            println("conda_build_maj_ver ${conda_build_maj_ver} detected. Applying bugfix patch.")
             def filename = "${env.WORKSPACE}/miniconda/lib/python${PY_VERSION}/" +
                            "site-packages/conda_build/config.py"
             def patches_dir = "${env.WORKSPACE}/patches"
