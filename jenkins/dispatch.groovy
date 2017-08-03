@@ -237,33 +237,36 @@ node(LABEL) {
         currentBuild.result = tmp_status
     }
 
-    stage ("Publication") {
-       // Copy packages built during this session to the publication path.
-       def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
-       def rsync_status = sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
-       // Use a lock file to prevent two dispatch jobs that finish at the same
-       // time from trampling each other's indexing process.
-       def lockfile = "${publication_path}/LOCK-Jenkins"
-       def file = new File(lockfile)
-       def tries_remaining = 5
-       if ( file.exists() ) {
-           println("Lockfile already exists, waiting for it to be released...")
-           while ( tries_remaining > 0) {
-               println("Waiting 3s for lockfile release...")
-               sleep(3000)
-               if ( !file.exists() ) {
-                   break
+    // Only run Publish stage if there were no package build falures.
+    if (currentBuild.result != "FAILURE") {
+        stage ("Publish") {
+           // Copy packages built during this session to the publication path.
+           def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
+           sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+           // Use a lock file to prevent two dispatch jobs that finish at the same
+           // time from trampling each other's indexing process.
+           def lockfile = "${publication_path}/LOCK-Jenkins"
+           def file = new File(lockfile)
+           def tries_remaining = 5
+           if (file.exists()) {
+               println("Lockfile already exists, waiting for it to be released...")
+               while ( tries_remaining > 0) {
+                   println("Waiting 3s for lockfile release...")
+                   sleep(3000)
+                   if ( !file.exists() ) {
+                       break
+                   }
+                   tries_remaining-- 
                }
-               tries_remaining-- 
            }
-       }
-       if ( tries_remaining != 0 ) {
-           def lockfile_status = sh(script: "touch ${lockfile}")
-           dir(this.conda_build_output_dir) {
-               def index_status = sh(script: "conda index ${publication_path}")
+           if (tries_remaining != 0) {
+               sh(script: "touch ${lockfile}")
+               dir(this.conda_build_output_dir) {
+                   sh(script: "conda index ${publication_path}")
+               }
+               sh(script: "rm -f ${lockfile}")
            }
-           lockfile_status = sh(script: "rm -f ${lockfile}")
-       }
+        }
     }
 }
 
