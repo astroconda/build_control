@@ -2,8 +2,10 @@ repository: 'https://github.com/astroconda/astroconda-contrib'
 channel_URL: 'http://ssb.stsci.edu/astroconda'
 numpy_version: 1.13
 packages:
-  - mosviz
-  - specutils
-  - glueviz
-  - glue-vispy-viewers
-  - glue-core
+  - costools
+  - crds
+#  - mosviz
+#  - specutils
+#  - glueviz
+#  - glue-vispy-viewers
+#  - glue-core
