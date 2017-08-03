@@ -53,7 +53,7 @@ node(LABEL) {
     // Make the log files a bit more deterministic
     env.PYTHONUNBUFFERED = "true"
 
-    sh "printenv"
+    sh "env | sort"
 
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.

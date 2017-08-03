@@ -10,7 +10,7 @@ node(this.label) {
         env.PYTHONUNBUFFERED = "true"
         def time = new Date()
 
-        sh "printenv"
+        sh "env | sort"
 
         println("\n" +
         "    Package Build Info Summary:\n" +
