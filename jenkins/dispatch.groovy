@@ -239,7 +239,7 @@ node(LABEL) {
 
     stage ("Publication") {
        // Copy packages built during this session to the publication path.
-       sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}")
+       sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}/${this.CONDA_PLATFORM}")
        // Use a lock file to prevent two dispatch jobs that finish at the same
        // time from trampling each other's indexing process.
        def lockfile = "${this.conda_build_output_dir}/LOCK-Jenkins"
