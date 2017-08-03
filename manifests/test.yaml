@@ -3,7 +3,7 @@ channel_URL: 'http://ssb.stsci.edu/astroconda'
 numpy_version: 1.13
 packages:
   - costools
-  - crds
+# - crds
 #  - mosviz
 #  - specutils
 #  - glueviz
