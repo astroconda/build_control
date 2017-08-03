@@ -238,17 +238,31 @@ node(LABEL) {
     }
 
     stage ("Publication") {
-       //sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}")
+       // Copy packages built during this session to the publication path.
+       sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}")
        // Use a lock file to prevent two dispatch jobs that finish at the same
        // time from trampling each other's indexing process.
-       def lockfile = "${PUBLICATION_PATH}/${this.CONDA_PLATFORM}/LOCK-Jenkins"
+       def lockfile = "${this.conda_build_output_dir}/LOCK-Jenkins"
        def file = new File(lockfile)
-       if ( !file.exists() ) {
-           sh(script: "touch ${lockfile}")
+       def tries_remaining = 5
+       if ( file.exists() ) {
+           println("Lockfile already exists, waiting for it to be released...")
+           while ( tries_remaining > 0) {
+               println("Waiting 3s for lockfile release...")
+               sleep(3000)
+               if ( !file.exists() ) {
+                   break
+               }
+               tries_remaining-- 
+           }
        }
-       //dir(this.conda_build_output_dir) {
-       //    sh(script: "conda index")
-       //}
+       if ( tries_remaining != 0 ) {
+           sh(script: "touch ${lockfile}")
+           dir(this.conda_build_output_dir) {
+               sh(script: "conda index")
+           }
+           sh(script: "rm -f ${lockfile}")
+       }
     }
 }
 
