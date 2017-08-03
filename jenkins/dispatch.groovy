@@ -23,6 +23,9 @@ this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_6
                           "MacOSX-py2.7":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
                           "MacOSX-py3.5":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
 
+// Conda paths
+this.conda_install_dir = "${env.WORKSPACE}/miniconda"
+
 node(LABEL) {
 
     this.OSname = null
@@ -43,6 +46,8 @@ node(LABEL) {
         this.CONDA_PLATFORM = "linux-64"
     }
     assert uname != null
+
+    this.conda_build_output_dir = "${this.conda_install_dir}/conda-bld/${this.CONDA_PLATFORM}"
 
     env.PYTHONPATH = ""
     // Make the log files a bit more deterministic
@@ -157,8 +162,8 @@ node(LABEL) {
         sh dl_cmd
 
         // Install specific versions of miniconda and conda-build
-        sh "bash ./${conda_installer} -b -p miniconda"
-        env.PATH = "${env.WORKSPACE}/miniconda/bin:${env.PATH}"
+        sh "bash ./${conda_installer} -b -p ${this.conda_install_dir}"
+        env.PATH = "${this.conda_install_dir}/bin:${env.PATH}"
         def cpkgs = "conda=${CONDA_VERSION} conda-build=${CONDA_BUILD_VERSION}"
         sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
@@ -167,7 +172,7 @@ node(LABEL) {
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
         if (conda_build_maj_ver == "2") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
-            def filename = "${env.WORKSPACE}/miniconda/lib/python${PY_VERSION}/" +
+            def filename = "${this.conda_install_dir}/lib/python${PY_VERSION}/" +
                            "site-packages/conda_build/config.py"
             def patches_dir = "${env.WORKSPACE}/patches"
             def patchname = "conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
@@ -233,7 +238,17 @@ node(LABEL) {
     }
 
     stage ("Publication") {
-       println("PUBLICATION_PATH: ${PUBLICATION_PATH}")
+       //sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}")
+       // Use a lock file to prevent two dispatch jobs that finish at the same
+       // time from trampling each other's indexing process.
+       PrintWriter writer = null
+       f = new File("${PUBLICATION_PATH}/LOCK-Jenkins")
+       writer = new PrintWriter(f)
+       writer.println("Lock file output")
+       writer.close()
+       //dir(this.conda_build_output_dir) {
+       //    sh(script: "conda index")
+       //}
     }
 }
 
