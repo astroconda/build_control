@@ -231,5 +231,9 @@ node(LABEL) {
         tmp_status = tmp_status.trim()
         currentBuild.result = tmp_status
     }
+
+    stage ("Publication") {
+       println("PUBLICATION_PATH: ${PUBLICATION_PATH}")
+    }
 }
 
