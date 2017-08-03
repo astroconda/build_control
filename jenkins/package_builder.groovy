@@ -80,27 +80,29 @@ node(this.label) {
                 }
             }
 
-            stage("Test") {
-                build_cmd = cmd
-                args = ["--test",
-                        "--python=${this.py_version}",
-                        "--numpy=${this.numpy_version}"]
-                for (arg in args) {
-                    build_cmd = "${build_cmd} ${arg}"
-                }
-                stat = 999
-                stat = sh(script: "${build_cmd} ${env.JOB_BASE_NAME}",
-                          returnStatus: true)
-                if (stat != 0) {
-                    currentBuild.result = "UNSTABLE"
-                    // Ratchet up the overall build status severity if this
-                    // is the most severe seen so far.
-                    if (build_status == "SUCCESS") {
-                        sh "echo ${currentBuild.result} > ${this.build_status_file}"
+            // Skip test stage if build stage has failed.
+            if (currentBuild.result != "FAILURE") {
+                stage("Test") {
+                    build_cmd = cmd
+                    args = ["--test",
+                            "--python=${this.py_version}",
+                            "--numpy=${this.numpy_version}"]
+                    for (arg in args) {
+                        build_cmd = "${build_cmd} ${arg}"
+                    }
+                    stat = 999
+                    stat = sh(script: "${build_cmd} ${env.JOB_BASE_NAME}",
+                              returnStatus: true)
+                    if (stat != 0) {
+                        currentBuild.result = "UNSTABLE"
+                        // Ratchet up the overall build status severity if this
+                        // is the most severe seen so far.
+                        if (build_status == "SUCCESS") {
+                            sh "echo ${currentBuild.result} > ${this.build_status_file}"
+                        }
                     }
                 }
             }
-
         } // end dir
     }
 
