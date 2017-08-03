@@ -23,8 +23,6 @@ this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_6
                           "MacOSX-py2.7":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
                           "MacOSX-py3.5":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
 
-// Conda paths
-this.conda_install_dir = "${env.WORKSPACE}/miniconda"
 
 node(LABEL) {
 
@@ -47,6 +45,8 @@ node(LABEL) {
     }
     assert uname != null
 
+    // Conda paths
+    this.conda_install_dir = "${env.WORKSPACE}/miniconda"
     this.conda_build_output_dir = "${this.conda_install_dir}/conda-bld/${this.CONDA_PLATFORM}"
 
     env.PYTHONPATH = ""
