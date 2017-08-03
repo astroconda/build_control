@@ -46,7 +46,7 @@ pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     "CONDA_VERSION: ${conda_version}\n" +
     "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
     "CONDA_BASE_URL: ${conda_base_URL}\n" +
-    "UTILS_REPO: ${utils_repo}\n")
+    "UTILS_REPO: ${utils_repo}\n" +
     "PUBLICATION_PATH: ${publication_path}\n")
     environmentVariables {
         env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
