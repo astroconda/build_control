@@ -241,13 +241,11 @@ node(LABEL) {
        //sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${PUBLICATION_PATH}")
        // Use a lock file to prevent two dispatch jobs that finish at the same
        // time from trampling each other's indexing process.
-       sh(script: "touch ${PUBLICATION_PATH}/LOCK-Jenkins")
-       //PrintWriter writer = null
-       //f = new File("${PUBLICATION_PATH}/LOCK-Jenkins")
-       ////f = new File("${PUBLICATION_PATH}/${this.CONDA_PLATFORM}/LOCK-Jenkins")
-       //writer = new PrintWriter(f)
-       //writer.println("Lock file output")
-       //writer.close()
+       def lockfile = "${PUBLICATION_PATH}/${this.CONDA_PLATFORM}/LOCK-Jenkins"
+       def file = new File(lockfile)
+       if ( !file.exists() ) {
+           sh(script: "touch ${lockfile}")
+       }
        //dir(this.conda_build_output_dir) {
        //    sh(script: "conda index")
        //}
