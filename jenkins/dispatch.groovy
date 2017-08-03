@@ -240,8 +240,7 @@ node(LABEL) {
     stage ("Publication") {
        // Copy packages built during this session to the publication path.
        def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
-       //def rsync_status = sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
-       sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+       def rsync_status = sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
        // Use a lock file to prevent two dispatch jobs that finish at the same
        // time from trampling each other's indexing process.
        def lockfile = "${publication_path}/LOCK-Jenkins"
@@ -259,14 +258,11 @@ node(LABEL) {
            }
        }
        if ( tries_remaining != 0 ) {
-           //def lockfile_status = sh(script: "touch ${lockfile}")
-           sh(script: "touch ${lockfile}")
+           def lockfile_status = sh(script: "touch ${lockfile}")
            dir(this.conda_build_output_dir) {
-               //def index_status = sh(script: "conda index ${publication_path}")
-               sh(script: "conda index ${publication_path}")
+               def index_status = sh(script: "conda index ${publication_path}")
            }
-           //lockfile_status = sh(script: "rm -f ${lockfile}")
-           sh(script: "rm -f ${lockfile}")
+           lockfile_status = sh(script: "rm -f ${lockfile}")
        }
     }
 }
