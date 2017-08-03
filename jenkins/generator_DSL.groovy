@@ -47,7 +47,7 @@ pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
     "CONDA_BASE_URL: ${conda_base_URL}\n" +
     "UTILS_REPO: ${utils_repo}\n" +
-    "PUBLICATION_PATH: ${publication_path}\n")
+    "PUBLICATION_ROOT: ${publication_root}\n")
     environmentVariables {
         env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
         env("SCRIPT", this.script)
@@ -60,7 +60,7 @@ pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
         env("CONDA_BUILD_VERSION", conda_build_version)
         env("CONDA_BASE_URL", conda_base_URL)
         env("UTILS_REPO", utils_repo)
-        env("PUBLICATION_PATH", publication_path)
+        env("PUBLICATION_ROOT", publication_root)
     }
     definition {
         cps {
