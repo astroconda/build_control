@@ -262,7 +262,7 @@ node(LABEL) {
            dir(this.conda_build_output_dir) {
                def index_status = sh(script: "conda index ${publication_path}")
            }
-           def lockfile_status = sh(script: "rm -f ${lockfile}")
+           lockfile_status = sh(script: "rm -f ${lockfile}")
        }
     }
 }
