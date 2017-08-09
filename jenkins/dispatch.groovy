@@ -242,8 +242,9 @@ node(LABEL) {
 
     stage ("Publish") {
         def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
-        def artifacts_present = sh(script: "ls ${publication_path}/*.tar.bz2 >/dev/null 2>&1")
         // Copy and index packages if any were produced in the build.
+        def artifacts_present = sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1")
+        println("artifacts_present: ${artifacts_present}")
         if (artifacts_present == "0") {
             sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
             // Use a lock file to prevent two dispatch jobs that finish at the same
