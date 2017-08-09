@@ -247,7 +247,7 @@ node(LABEL) {
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
                returnStatus: true)
         println("artifacts present = ${artifacts_present}")
-        if (artifacts_present == "0") {
+        if (artifacts_present == 0) {
             sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
