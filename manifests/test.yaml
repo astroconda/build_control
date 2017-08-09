@@ -4,14 +4,14 @@ numpy_version: 1.13
 packages:
   - costools
   - cfitsio
-  - ds9
-  - crds
-  - cube-tools
-  - sphinxcontrib-programoutput
-  - pyds9
-  - wcstools
-  - webbpsf
-  
+#  - ds9
+#  - crds
+#  - cube-tools
+#  - sphinxcontrib-programoutput
+#  - pyds9
+#  - wcstools
+#  - webbpsf
+#  
 #  - mosviz
 #  - specutils
 #  - glueviz
