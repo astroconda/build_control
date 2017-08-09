@@ -23,6 +23,9 @@ this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_6
                           "MacOSX-py2.7":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
                           "MacOSX-py3.5":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
 
+// Values controlling the conda index stage which happens after any packages are created.
+this.max_publication_tries = 5
+this.publication_lock_wait_s = 10
 
 node(LABEL) {
 
@@ -237,35 +240,35 @@ node(LABEL) {
         currentBuild.result = tmp_status
     }
 
-    // Only run Publish stage if there were no package build falures.
-    if (currentBuild.result != "FAILURE") {
-        stage ("Publish") {
-           // Copy packages built during this session to the publication path.
-           def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
-           sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
-           // Use a lock file to prevent two dispatch jobs that finish at the same
-           // time from trampling each other's indexing process.
-           def lockfile = "${publication_path}/LOCK-Jenkins"
-           def file = new File(lockfile)
-           def tries_remaining = 5
-           if (file.exists()) {
-               println("Lockfile already exists, waiting for it to be released...")
-               while ( tries_remaining > 0) {
-                   println("Waiting 3s for lockfile release...")
-                   sleep(3000)
-                   if ( !file.exists() ) {
-                       break
-                   }
-                   tries_remaining-- 
-               }
-           }
-           if (tries_remaining != 0) {
-               sh(script: "touch ${lockfile}")
-               dir(this.conda_build_output_dir) {
-                   sh(script: "conda index ${publication_path}")
-               }
-               sh(script: "rm -f ${lockfile}")
-           }
+    stage ("Publish") {
+        def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
+        def artifacts_present = sh(script: "ls ${publication_path}/*.tar.bz2 >/dev/null 2>&1")
+        // Copy and index packages if any were produced in the build.
+        if (artifacts_present == "0") {
+            sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+            // Use a lock file to prevent two dispatch jobs that finish at the same
+            // time from trampling each other's indexing process.
+            def lockfile = "${publication_path}/LOCK-Jenkins"
+            def file = new File(lockfile)
+            def tries_remaining = this.max_publication_tries
+            if (file.exists()) {
+                println("Lockfile already exists, waiting for it to be released...")
+                while ( tries_remaining > 0) {
+                    println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
+                    sleep(this.publication_lock_wait_s * 1000)
+                    if ( !file.exists() ) {
+                        break
+                    }
+                    tries_remaining--
+                }
+            }
+            if (tries_remaining != 0) {
+                sh(script: "touch ${lockfile}")
+                dir(this.conda_build_output_dir) {
+                    sh(script: "conda index ${publication_path}")
+                }
+                sh(script: "rm -f ${lockfile}")
+            }
         }
     }
 }
