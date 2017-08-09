@@ -2,16 +2,12 @@ repository: 'https://github.com/astroconda/astroconda-dev'
 channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 numpy_version: 1.13
 packages:
-  - costools
-  - cfitsio
-  - ds9
   - crds
   - cube-tools
   - sphinxcontrib-programoutput
   - pyds9
   - wcstools
   - webbpsf
-  
 #  - mosviz
 #  - specutils
 #  - glueviz
