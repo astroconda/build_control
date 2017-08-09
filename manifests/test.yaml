@@ -1,5 +1,5 @@
-repository: 'https://github.com/astroconda/astroconda-contrib'
-channel_URL: 'http://ssb.stsci.edu/astroconda'
+repository: 'https://github.com/astroconda/astroconda-dev'
+channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 numpy_version: 1.13
 packages:
   - costools
