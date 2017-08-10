@@ -171,7 +171,7 @@ node(LABEL) {
         sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
         // Apply bugfix patch only to conda_build 2.x
-        def conda_build_version = sh(script: "conda-build --version", returnStdout: true).trim()
+        def conda_build_version = sh(script: "conda-build --version 2>&1", returnStdout: true).trim()
         println(" **>> conda_build_version = ${conda_build_version}")
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
         if (conda_build_maj_ver == "2") {
