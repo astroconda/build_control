@@ -171,8 +171,10 @@ node(LABEL) {
         sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
         // Apply bugfix patch only to conda_build 2.x
+        // py2 conda-build outputs version string to stderr
+        // whereas the py3 version outputs it to stdout. Merge output streams here to capture
+        // all output under both circumstances.
         def conda_build_version = sh(script: "conda-build --version 2>&1", returnStdout: true).trim()
-        println(" **>> conda_build_version = ${conda_build_version}")
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
         if (conda_build_maj_ver == "2") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
