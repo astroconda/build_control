@@ -23,6 +23,10 @@ this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_6
                           "MacOSX-py2.7":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
                           "MacOSX-py3.5":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
 
+// Values controlling the conda index stage which happens after any packages are created.
+this.max_publication_tries = 5
+this.publication_lock_wait_s = 10
+
 node(LABEL) {
 
     this.OSname = null
@@ -44,11 +48,15 @@ node(LABEL) {
     }
     assert uname != null
 
+    // Conda paths
+    this.conda_install_dir = "${env.WORKSPACE}/miniconda"
+    this.conda_build_output_dir = "${this.conda_install_dir}/conda-bld/${this.CONDA_PLATFORM}"
+
     env.PYTHONPATH = ""
     // Make the log files a bit more deterministic
     env.PYTHONUNBUFFERED = "true"
 
-    sh "printenv"
+    sh "env | sort"
 
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
@@ -157,8 +165,8 @@ node(LABEL) {
         sh dl_cmd
 
         // Install specific versions of miniconda and conda-build
-        sh "bash ./${conda_installer} -b -p miniconda"
-        env.PATH = "${env.WORKSPACE}/miniconda/bin:${env.PATH}"
+        sh "bash ./${conda_installer} -b -p ${this.conda_install_dir}"
+        env.PATH = "${this.conda_install_dir}/bin:${env.PATH}"
         def cpkgs = "conda=${CONDA_VERSION} conda-build=${CONDA_BUILD_VERSION}"
         sh "conda install --quiet --yes ${cpkgs} python=${PY_VERSION}"
 
@@ -167,7 +175,7 @@ node(LABEL) {
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
         if (conda_build_maj_ver == "2") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
-            def filename = "${env.WORKSPACE}/miniconda/lib/python${PY_VERSION}/" +
+            def filename = "${this.conda_install_dir}/lib/python${PY_VERSION}/" +
                            "site-packages/conda_build/config.py"
             def patches_dir = "${env.WORKSPACE}/patches"
             def patchname = "conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
@@ -230,6 +238,41 @@ node(LABEL) {
         def tmp_status = readFile this.build_status_file
         tmp_status = tmp_status.trim()
         currentBuild.result = tmp_status
+    }
+
+    stage ("Publish") {
+        def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
+        // Copy and index packages if any were produced in the build.
+        def artifacts_present =
+            sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
+               returnStatus: true)
+        println("artifacts present = ${artifacts_present}")
+        if (artifacts_present == 0) {
+            sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+            // Use a lock file to prevent two dispatch jobs that finish at the same
+            // time from trampling each other's indexing process.
+            def lockfile = "${publication_path}/LOCK-Jenkins"
+            def file = new File(lockfile)
+            def tries_remaining = this.max_publication_tries
+            if (file.exists()) {
+                println("Lockfile already exists, waiting for it to be released...")
+                while ( tries_remaining > 0) {
+                    println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
+                    sleep(this.publication_lock_wait_s * 1000)
+                    if ( !file.exists() ) {
+                        break
+                    }
+                    tries_remaining--
+                }
+            }
+            if (tries_remaining != 0) {
+                sh(script: "touch ${lockfile}")
+                dir(this.conda_build_output_dir) {
+                    sh(script: "conda index ${publication_path}")
+                }
+                sh(script: "rm -f ${lockfile}")
+            }
+        }
     }
 }
 
