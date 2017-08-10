@@ -249,7 +249,6 @@ node(LABEL) {
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
                returnStatus: true)
-        println("artifacts present = ${artifacts_present}")
         if (artifacts_present == 0) {
             sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
             // Use a lock file to prevent two dispatch jobs that finish at the same
@@ -275,6 +274,8 @@ node(LABEL) {
                 }
                 sh(script: "rm -f ${lockfile}")
             }
+        } else {
+            println("No build artifacts found.")
         }
     }
 }
