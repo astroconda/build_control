@@ -172,6 +172,7 @@ node(LABEL) {
 
         // Apply bugfix patch only to conda_build 2.x
         def conda_build_version = sh(script: "conda-build --version", returnStdout: true)
+        println(" **>> conda_build_version = ${conda_build_version}")
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
         if (conda_build_maj_ver == "2") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
