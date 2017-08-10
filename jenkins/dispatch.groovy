@@ -18,10 +18,10 @@ this.recipes_dir = "conda-recipes"
 this.build_status_file = "propagated_build_status"
 
 // The conda installer script to use for various <OS><py_version> combinations.
-this.conda_installers  = ["Linux-py2.7":"Miniconda2-${CONDA_VERSION}-Linux-x86_64.sh",
-                          "Linux-py3.5":"Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh",
-                          "MacOSX-py2.7":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
-                          "MacOSX-py3.5":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
+this.conda_installers  = ["Linux-py2":"Miniconda2-${CONDA_VERSION}-Linux-x86_64.sh",
+                          "Linux-py3":"Miniconda3-${CONDA_VERSION}-Linux-x86_64.sh",
+                          "MacOSX-py2":"Miniconda2-${CONDA_VERSION}-MacOSX-x86_64.sh",
+                          "MacOSX-py3":"Miniconda3-${CONDA_VERSION}-MacOSX-x86_64.sh"]
 
 // Values controlling the conda index stage which happens after any packages are created.
 this.max_publication_tries = 5
@@ -159,8 +159,10 @@ node(LABEL) {
             sh "false"
         }
 
+        //def conda_installer =
+        //   this.conda_installers["${this.OSname}-py${PY_VERSION}"]
         def conda_installer =
-           this.conda_installers["${this.OSname}-py${PY_VERSION}"]
+           this.conda_installers["${this.OSname}-py${this.py_maj_version}"]
         dl_cmd = dl_cmd + " ${CONDA_BASE_URL}/${conda_installer}"
         sh dl_cmd
 
