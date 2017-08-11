@@ -262,7 +262,7 @@ node(LABEL) {
                 println("Lockfile already exists, waiting for it to be released...")
                 while ( tries_remaining > 0) {
                     println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
-                    sleep(this.publication_lock_wait_s * 1000)
+                    sleep(this.publication_lock_wait_s)
                     if ( !file.exists() ) {
                         break
                     }
