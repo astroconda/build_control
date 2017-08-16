@@ -108,6 +108,7 @@ node(LABEL) {
         "Recipe repository: ${this.manifest.repository}\n" +
         "Numpy version spec: ${this.manifest.numpy_version}\n" +
         "Channel URL: ${this.manifest.channel_URL}\n" +
+        "Publication root: ${this.manifest.publication_root}\n" +
         "Package list:\n${manifest_pkg_txt}")
     }
 
@@ -159,8 +160,6 @@ node(LABEL) {
             sh "false"
         }
 
-        //def conda_installer =
-        //   this.conda_installers["${this.OSname}-py${PY_VERSION}"]
         def conda_installer =
            this.conda_installers["${this.OSname}-py${this.py_maj_version}"]
         dl_cmd = dl_cmd + " ${CONDA_BASE_URL}/${conda_installer}"
@@ -246,7 +245,7 @@ node(LABEL) {
     }
 
     stage ("Publish") {
-        def publication_path = "${PUBLICATION_ROOT}/${this.CONDA_PLATFORM}"
+        def publication_path = "${this.manifest.publication_root}/${this.CONDA_PLATFORM}"
         // Copy and index packages if any were produced in the build.
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
