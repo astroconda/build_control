@@ -8,7 +8,7 @@
 this.ldir = "libs"
 
 // URL for the YAML support library used for accessing manifest files
-yURL = "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar"
+yaml_lib_url = "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar"
 
 // DSL script path within the repository obtained for this job.
 this.dsl_script = "jenkins/generator_DSL.groovy"
@@ -38,6 +38,7 @@ node("master") {
         // Get branch spec component after last '/' character.
         // Branch names themselves shall not have slashes in them
         // when specified in the job-suite-generator job configuration.
+        // This may also describe a tag, rather than a branch.
         build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
         sh "echo ${build_control_branch} > VAR-build_control_branch"
 
@@ -68,7 +69,7 @@ node("master") {
         sh "mkdir -p ${this.ldir}"
         // Obtain libraries to facilitate job generation tasks.
         dir ("libs") {
-            sh "curl -O ${yURL}"
+            sh "curl -O ${yaml_lib_url}"
         }
         // Copy files from the implicit checkout of the build_control directory
         // (handled by the job that reads this pipeline script) into the actual
@@ -77,7 +78,7 @@ node("master") {
         sh "cp -r ${env.WORKSPACE}@script/* ."
     }
 
-    stage("Spawn job definitions") {
+    stage("Spawn job definition") {
         jobDsl targets: [this.dsl_script].join("\n"),
                lookupStrategy: "SEED_JOB",
                additionalClasspath: ["${this.ldir}/*.jar"].join("\n"),
