@@ -1,5 +1,11 @@
+# Recipe repository
 repository: 'https://github.com/astroconda/astroconda-contrib'
+
+# Publication channel to consult when determining what packages already exist.
 channel_URL: 'http://ssb.stsci.edu/astroconda'
+
+# publication_root path needs to be visible from the slave nodes.
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-pub-staging'
 numpy_version: 1.11
 packages:
   - stsci-hst
