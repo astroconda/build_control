@@ -250,8 +250,9 @@ node(LABEL) {
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
                returnStatus: true)
+        def rsync_cmd = "rsync -avzr --ignore-existing"
         if (artifacts_present == 0) {
-            sh(script: "rsync -avzr ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+            sh(script: "${rsync_cmd} ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
             def lockfile = "${publication_path}/LOCK-Jenkins"
