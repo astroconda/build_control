@@ -8,7 +8,12 @@
 this.ldir = "libs"
 
 // URL for the YAML support library used for accessing manifest files
-yaml_lib_url = "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar"
+// Site file cache for components that would otherwise be downloaded for each
+// build. A symlink exists in the Jenkins user's home directory on the build
+// master which points to the actual storage location.
+site_file_cache_dir = "~/site-cache"
+yaml_lib_file = "snakeyaml-1.17.jar"
+yaml_lib_url_base = "https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17"
 
 // DSL script path within the repository obtained for this job.
 this.dsl_script = "jenkins/generator_DSL.groovy"
@@ -68,8 +73,14 @@ node("master") {
     stage("Setup") {
         sh "mkdir -p ${this.ldir}"
         // Obtain libraries to facilitate job generation tasks.
+        // Attempt to copy from site cache first, if that fails, try to
+        // download from the internet.
         dir ("libs") {
-            sh "curl -O ${yaml_lib_url}"
+            def cp_status = sh(script: "cp ${site_file_cache_dir}/${yaml_lib_file} .",
+               returnStatus: true)
+            if (cp_status != 0) {
+                sh "curl -O ${yaml_lib_url_base}/${yaml_lib_file}"
+            }
         }
         // Copy files from the implicit checkout of the build_control directory
         // (handled by the job that reads this pipeline script) into the actual
