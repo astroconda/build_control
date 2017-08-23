@@ -8,12 +8,13 @@ channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-dev-staging'
 numpy_version: 1.13
 packages:
-  - crds
-  - cube-tools
-  - sphinxcontrib-programoutput
-  - pyds9
-  - wcstools
-  - webbpsf
+  - fitsverify
+#  - crds
+#  - cube-tools
+#  - sphinxcontrib-programoutput
+#  - pyds9
+#  - wcstools
+#  - webbpsf
 #  - mosviz
 #  - specutils
 #  - glueviz
