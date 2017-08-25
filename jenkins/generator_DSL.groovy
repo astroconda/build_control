@@ -27,6 +27,13 @@ this.build_control_repo = this.build_control_repo.trim()
 this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
 this.build_control_branch= this.build_control_branch.trim()
 
+
+println("**LABELS:")
+for (label in labels) {
+  println("${label}")
+}
+
+
 pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     // At trigger-time, allow for setting manifest culling behavior.
     parameters {
@@ -40,6 +47,7 @@ pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
     "script: ${this.script}\n" +
     "MANIFEST_FILE: ${manifest_file}\n" +
     "LABEL: ${label}\n" +
+    "LABELS: ${labels}\n" +
     "PY_VERSION: ${py_version}\n" +
     "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
     "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +

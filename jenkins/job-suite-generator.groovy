@@ -60,6 +60,7 @@ node("master") {
         "  Parameters:\n" +
         "manifest_file: ${this.manifest_file}\n" +
         "label: ${this.label}\n" +
+        "labels: ${this.labels}\n" +
         "py_version: ${this.py_version}\n" +
         "conda_version: ${this.conda_version}\n" +
         "conda_build_version: ${this.conda_build_version}\n" +
