@@ -59,7 +59,6 @@ node("master") {
         "build_control_branch: ${build_control_branch}\n" +
         "  Parameters:\n" +
         "manifest_file: ${this.manifest_file}\n" +
-        "label: ${this.label}\n" +
         "labels: ${this.labels}\n" +
         "py_version: ${this.py_version}\n" +
         "conda_version: ${this.conda_version}\n" +
