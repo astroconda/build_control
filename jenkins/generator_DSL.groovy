@@ -32,7 +32,7 @@ for (label in labels.trim().tokenize()) {
                         "build control repo: ${build_control_repo}\n" +
                         "build control branch/tag: ${build_control_branch}\n" +
                         "conda version: ${conda_version}\n" +
-                        "conda-build version: ${conda-build_version}\n" +
+                        "conda-build version: ${conda_build_version}\n" +
                         "utils_repo: ${utils_repo}")
         }
 
