@@ -24,11 +24,13 @@ this.build_control_branch= this.build_control_branch.trim()
 
 
 println("**combinations:")
-def label = ""
-def py_version = ""
+this.label = ""
+this.py_version = ""
 for (label in labels.trim().tokenize()) {
     for (py_version in py_versions.trim().tokenize()) {
-        println("**** ${label}-${py_version}")
+        this.label = label
+        this.py_version = py_version
+        println("**** ${this.label}-${this.py_version}")
 
         //-----------------------------------------------------------------------
         // Create a folder to contain the jobs which are created below.
