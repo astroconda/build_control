@@ -29,7 +29,7 @@ this.build_control_branch= this.build_control_branch.trim()
 
 
 println("**LABELS:")
-for (label in labels) {
+for (label in labels.trim().tokenize()) {
   println("${label}")
 }
 
