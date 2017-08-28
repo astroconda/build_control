@@ -9,12 +9,6 @@ def config = yaml.load(readFileFromWorkspace("manifests/${manifest_file}"))
 def job_def_generation_time = new Date()
 
 
-
-
-//-----------------------------------------------------------------------
-// Generate the dispatch job that will trigger the chain of package
-// build jobs.
-
 this.script = "dispatch.groovy"
 
 this.build_control_repo = readFileFromWorkspace("VAR-build_control_repo")
@@ -22,19 +16,29 @@ this.build_control_repo = this.build_control_repo.trim()
 this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
 this.build_control_branch= this.build_control_branch.trim()
 
-
-println("**combinations:")
+// For each label (OS) in the list provided by the 'labels' job parameter, iterate
+// over each python version provided by the 'py_versions' job parameter, to obtain
+// every combination of OS and python version. Generate a separate job suite for
+// each combination.
 for (label in labels.trim().tokenize()) {
     for (py_version in py_versions.trim().tokenize()) {
-        println("**** ${label}-${py_version}")
 
         //-----------------------------------------------------------------------
         // Create a folder to contain the jobs which are created below.
 
         suite_name = "${manifest_file.tokenize(".")[0]}_${label}_py${py_version}"
-        folder(suite_name)
+        folder(suite_name) {
+            description("Build suite generated: ${job_def_generation_time}\n" +
+                        "build control repo: ${build_control_repo}\n" +
+                        "build control branch/tag: ${build_control_branch}\n" +
+                        "conda version: ${conda_version}\n" +
+                        "conda-build version: ${conda-build_version}\n" +
+                        "utils_repo: ${utils_repo}")
+        }
 
-
+        //-----------------------------------------------------------------------
+        // Generate the dispatch job that will trigger the chain of package
+        // build jobs.
         pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
             // At trigger-time, allow for setting manifest culling behavior.
             parameters {
@@ -48,7 +52,6 @@ for (label in labels.trim().tokenize()) {
             "script: ${this.script}\n" +
             "MANIFEST_FILE: ${manifest_file}\n" +
             "LABEL: ${label}\n" +
-            "LABELS: ${labels}\n" +
             "PY_VERSION: ${py_version}\n" +
             "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
             "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +
