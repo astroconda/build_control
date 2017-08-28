@@ -23,7 +23,9 @@ this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
 this.build_control_branch= this.build_control_branch.trim()
 
 
-println("**LABELS:")
+println("**combinations:")
+def label = ""
+def py_version = ""
 for (label in labels.trim().tokenize()) {
     for (py_version in py_versions.trim().tokenize()) {
         println("**** ${label}-${py_version}")
