@@ -40,16 +40,17 @@ node("master") {
         build_control_repo = scm.getUserRemoteConfigs()[0].getUrl()
         build_control_tag = ""
         sh "echo ${build_control_repo} > VAR-build_control_repo"
+        build_control_bt_spec = scm.branches[0].toString()
 
         // Get branch spec component after last '/' character.
         // Branch names themselves shall not have slashes in them
         // when specified in the job-suite-generator job configuration.
         // This may also describe a tag, rather than a branch.
-        if (build_control_branch.find("tags") != null) {
+        if (build_control_bt_spec.find("tags") != null) {
             build_control_branch = "master"
-            build_control_tag = build_control_branch.tokenize("/")
+            build_control_tag = build_control_bt_spec.tokenize("/")[-1]
         } else { // a branch, including */master
-            build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
+            build_control_branch = build_control_bt_spec.tokenize("/")[-1]
         }
         sh "echo ${build_control_branch} > VAR-build_control_branch"
         sh "echo ${build_control_tag} > VAR-build_control_tag"
