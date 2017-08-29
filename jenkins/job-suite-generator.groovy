@@ -37,14 +37,18 @@ node("master") {
         // value to the jobDSL script.
 
         // Both 'scm.getUserRemoteConfigs' and 'getUrl' require script approval
-        build_control_repo= scm.getUserRemoteConfigs()[0].getUrl()
+        build_control_repo = scm.getUserRemoteConfigs()[0].getUrl()
         sh "echo ${build_control_repo} > VAR-build_control_repo"
 
         // Get branch spec component after last '/' character.
         // Branch names themselves shall not have slashes in them
         // when specified in the job-suite-generator job configuration.
         // This may also describe a tag, rather than a branch.
-        build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
+        if (build_control_branch.find("tags") != null) {
+            build_control_branch = scm.branches[0].toString()
+        } else {
+            build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
+        }
         sh "echo ${build_control_branch} > VAR-build_control_branch"
 
         // 'Parameters' variables are provided by the execution of the
