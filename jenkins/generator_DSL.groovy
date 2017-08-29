@@ -13,8 +13,12 @@ this.script = "dispatch.groovy"
 
 this.build_control_repo = readFileFromWorkspace("VAR-build_control_repo")
 this.build_control_repo = this.build_control_repo.trim()
+
 this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
 this.build_control_branch= this.build_control_branch.trim()
+
+this.build_control_tag = readFileFromWorkspace("VAR-build_control_tag")
+this.build_control_tag = this.build_control_tag.trim()
 
 // For each label (OS) in the list provided by the 'labels' job parameter, iterate
 // over each python version provided by the 'py_versions' job parameter, to obtain
@@ -30,7 +34,8 @@ for (label in labels.trim().tokenize()) {
         folder(suite_name) {
             description("Build suite generated: ${job_def_generation_time}\n" +
                         "build control repo: ${build_control_repo}\n" +
-                        "build control branch/tag: ${build_control_branch}\n" +
+                        "build control branch: ${build_control_branch}\n" +
+                        "build control tag: ${build_control_tag}\n" +
                         "conda version: ${conda_version}\n" +
                         "conda-build version: ${conda_build_version}\n" +
                         "utils_repo: ${utils_repo}")
@@ -55,6 +60,7 @@ for (label in labels.trim().tokenize()) {
             "PY_VERSION: ${py_version}\n" +
             "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
             "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +
+            "BUILD_CONTROL_TAG: ${build_control_tag}\n" +
             "CONDA_VERSION: ${conda_version}\n" +
             "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
             "CONDA_BASE_URL: ${conda_base_URL}\n" +
@@ -67,6 +73,7 @@ for (label in labels.trim().tokenize()) {
                 env("PY_VERSION", py_version)
                 env("BUILD_CONTROL_REPO", build_control_repo)
                 env("BUILD_CONTROL_BRANCH", build_control_branch)
+                env("BUILD_CONTROL_TAG", build_control_tag)
                 env("CONDA_VERSION", conda_version)
                 env("CONDA_BUILD_VERSION", conda_build_version)
                 env("CONDA_BASE_URL", conda_base_URL)
@@ -100,6 +107,9 @@ for (label in labels.trim().tokenize()) {
                     stringParam("build_control_branch",
                                 "build_control_branch-DEFAULTVALUE",
                                 "Branch checked out to obtain build system scripts.")
+                    stringParam("build_control_tag",
+                                "build_control_tag-DEFAULTVALUE",
+                                "Tag checked out to obtain build system scripts.")
                     stringParam("py_version",
                                 "py_version-DEFAULTVALUE",
                                 "python version to use")

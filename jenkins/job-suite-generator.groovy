@@ -37,15 +37,22 @@ node("master") {
         // value to the jobDSL script.
 
         // Both 'scm.getUserRemoteConfigs' and 'getUrl' require script approval
-        build_control_repo= scm.getUserRemoteConfigs()[0].getUrl()
+        build_control_repo = scm.getUserRemoteConfigs()[0].getUrl()
+        build_control_tag = ""
         sh "echo ${build_control_repo} > VAR-build_control_repo"
 
         // Get branch spec component after last '/' character.
         // Branch names themselves shall not have slashes in them
         // when specified in the job-suite-generator job configuration.
         // This may also describe a tag, rather than a branch.
-        build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
+        if (build_control_branch.find("tags") != null) {
+            build_control_branch = "master"
+            build_control_tag = build_control_branch.tokenize("/")
+        } else { // a branch, including */master
+            build_control_branch = scm.branches[0].toString().tokenize("/")[-1]
+        }
         sh "echo ${build_control_branch} > VAR-build_control_branch"
+        sh "echo ${build_control_tag} > VAR-build_control_tag"
 
         // 'Parameters' variables are provided by the execution of the
         // generator build task with parameters. Each is populated by a
@@ -57,12 +64,14 @@ node("master") {
         println("  From job config:\n" +
         "build_control_repo: ${build_control_repo}\n" +
         "build_control_branch: ${build_control_branch}\n" +
+        "build_control_tag: ${build_control_tag}\n" +
         "  Parameters:\n" +
         "manifest_file: ${this.manifest_file}\n" +
         "labels: ${this.labels}\n" +
         "py_versions: ${this.py_versions}\n" +
         "conda_version: ${this.conda_version}\n" +
         "conda_build_version: ${this.conda_build_version}\n" +
+        "conda_build_tag: ${this.conda_build_tag}\n" +
         "conda_base_URL: ${this.conda_base_URL}\n" +
         "utils_repo: ${this.utils_repo}\n" +
         "old_jobs_action: ${this.old_jobs_action}\n" +
