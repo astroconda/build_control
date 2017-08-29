@@ -25,6 +25,7 @@ node(this.label) {
         "env.JENKINS_HOME: ${env.JENKINS_HOME}\n" +
         "parameter build_control_repo: ${this.build_control_repo}\n" +
         "parameter build_control_branch: ${this.build_control_branch}\n" +
+        "parameter build_control_tag: ${this.build_control_tag}\n" +
         "parameter parent_workspace: ${this.parent_workspace}\n" +
         "parameter py_version: ${this.py_version}\n" +
         "parameter numpy_version: ${this.numpy_version}\n" +
