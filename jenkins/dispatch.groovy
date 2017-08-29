@@ -107,6 +107,7 @@ node(LABEL) {
         "CONDA_BASE_URL: ${CONDA_BASE_URL}\n" +
         "BUILD_CONTROL_REPO: ${BUILD_CONTROL_REPO}\n" +
         "BUILD_CONTROL_BRANCH: ${BUILD_CONTROL_BRANCH}\n" +
+        "BUILD_CONTROL_TAG: ${BUILD_CONTROL_TAG}\n" +
         "UTILS_REPO: ${UTILS_REPO}\n" +
         "  Trigger parameters:\n" +
         "this.cull_manifest: ${this.cull_manifest}\n" +
