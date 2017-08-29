@@ -46,6 +46,8 @@ node("master") {
         // Branch names themselves shall not have slashes in them
         // when specified in the job-suite-generator job configuration.
         // This may also describe a tag, rather than a branch.
+        // Requires in-process script approval for:
+        //   java.lang.String java.lang.String (.find method)
         if (build_control_bt_spec.find("tags") != null) {
             build_control_branch = "master"
             build_control_tag = build_control_bt_spec.tokenize("/")[-1]
@@ -72,7 +74,6 @@ node("master") {
         "py_versions: ${this.py_versions}\n" +
         "conda_version: ${this.conda_version}\n" +
         "conda_build_version: ${this.conda_build_version}\n" +
-        "conda_build_tag: ${this.conda_build_tag}\n" +
         "conda_base_URL: ${this.conda_base_URL}\n" +
         "utils_repo: ${this.utils_repo}\n" +
         "old_jobs_action: ${this.old_jobs_action}\n" +
