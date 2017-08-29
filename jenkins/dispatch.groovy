@@ -64,6 +64,12 @@ node(LABEL) {
 
     // Get the manifest and build control files
     git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
+    // If a tag was specified in the job-suite-generator configuration,
+    // explicitly check out that tag after cloning the (master) branch,
+    // since the 'git' pipeline step does not yet support accessing tags.
+    if (BUILD_CONTROL_TAG != "") {
+        sh(script: "git checkout tags/${BUILD_CONTROL_TAG}")
+    }
 
     this.manifest = readYaml file: "manifests/${MANIFEST_FILE}"
     if (this.manifest.channel_URL[-1..-1] == "/") {
