@@ -101,6 +101,7 @@ node(LABEL) {
         "LABEL: ${LABEL}\n" +
         "env.NODE_NAME: ${env.NODE_NAME}\n" +
         "PY_VERSION: ${PY_VERSION}\n" +
+        "NUMPY_VERSION: ${NUMPY_VERSION}\n" +
         "MANIFEST_FILE: ${MANIFEST_FILE}\n" +
         "CONDA_VERSION: ${CONDA_VERSION}\n" +
         "CONDA_BUILD_VERSION: ${CONDA_BUILD_VERSION}\n" +
@@ -237,8 +238,9 @@ node(LABEL) {
                  string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
                  string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
                  string(name: "py_version", value: PY_VERSION),
-                 string(name: "numpy_version",
-                        value: "${this.manifest.numpy_version}"),
+                 //string(name: "numpy_version",
+                 //       value: "${this.manifest.numpy_version}"),
+                 string(name: "numpy_version", value: NUMPY_VERSION),
                  string(name: "parent_workspace", value: env.WORKSPACE),
                  string(name: "cull_manifest", value: this.cull_manifest),
                  string(name: "channel_URL", value: this.manifest.channel_URL)],
