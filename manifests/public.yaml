@@ -6,7 +6,6 @@ channel_URL: 'http://ssb.stsci.edu/astroconda'
 
 # publication_root path needs to be visible from the slave nodes.
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-pub-staging'
-numpy_version: 1.13
 packages:
   - stsci.tools
   - stsci.imagestats

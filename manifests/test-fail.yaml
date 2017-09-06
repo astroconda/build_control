@@ -5,8 +5,7 @@ repository: 'https://github.com/astroconda/astroconda-contrib'
 channel_URL: 'http://ssb.stsci.edu/astroconda'
 
 # publication_root path needs to be visible from the slave nodes.
-publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-pub-staging'
-numpy_version: 1.11
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-pub-testing'
 packages:
   - verhawk
   - INTENTIONALLY_INVALID
