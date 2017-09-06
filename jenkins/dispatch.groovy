@@ -212,6 +212,7 @@ node(LABEL) {
         cmd = "rambo"
         args = ["--platform ${this.CONDA_PLATFORM}",
                 "--python ${PY_VERSION}",
+                "--numpy ${NUMPY_VERSION}",
                 "--manifest manifests/${MANIFEST_FILE}",
                 "--file ${build_list_file}",
                 "${culled_option}",
