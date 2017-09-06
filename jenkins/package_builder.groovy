@@ -45,13 +45,14 @@ node(this.label) {
 
             cmd = "conda build"
 
+            // Use channel URL obtained from manifest in build command if
+            // manifest has been culled to allow packages being built to
+            // simply download dependency packages from the publication
+            // channel as needed, rather than build them as part of the
+            // package build session that requires them.
+            def channel_option = "--channel ${this.channel_URL}"
+
             stage("Build") {
-                // Use channel URL obtained from manifest in build command if
-                // manifest has been culled to allow packages being built to
-                // simply download dependency packages from the publication
-                // channel as needed, rather than build them as part of the
-                // package build session that requires them.
-                def channel_option = "--channel ${this.channel_URL}"
                 if (this.cull_manifest == "false") {
                     channel_option = ""
                 }
@@ -87,7 +88,10 @@ node(this.label) {
                     build_cmd = cmd
                     args = ["--test",
                             "--python=${this.py_version}",
-                            "--numpy=${this.numpy_version}"]
+                            "--numpy=${this.numpy_version}",
+                            "--override-channels",
+                            "--channel defaults",
+                            "${channel_option}"]
                     for (arg in args) {
                         build_cmd = "${build_cmd} ${arg}"
                     }
