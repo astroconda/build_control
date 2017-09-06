@@ -39,7 +39,8 @@ for (label in labels.trim().tokenize()) {
                             "build control tag: ${build_control_tag}\n" +
                             "conda version: ${conda_version}\n" +
                             "conda-build version: ${conda_build_version}\n" +
-                            "utils_repo: ${utils_repo}")
+                            "utils_repo: ${utils_repo}\n" +
+                            "publication_root: ${config.publication_root}")
             }
 
             //-----------------------------------------------------------------------
