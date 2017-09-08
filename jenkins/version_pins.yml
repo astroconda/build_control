@@ -1,0 +1,13 @@
+# This file is only honored when the build system is configured to use
+# conda-build 3.x.
+#
+# It allows the definition of a list of core dependency packages to pin to
+# the supplied values when building packages from a manifest in a job suite.
+#
+# Example use case:
+#   - setuptools 36.4.0 is released in a broken state which prevents packages
+#     that have it as a build requirement from building.
+#   - setuptools can be pinned to an earlier version for all package builds
+#     that happen in a given job suite, allowing them to succeed. 
+packages:
+  - setuptools 27.2.0

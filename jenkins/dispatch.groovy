@@ -27,6 +27,10 @@ this.conda_installers  = ["Linux-py2":"Miniconda2-${CONDA_VERSION}-Linux-x86_64.
 this.max_publication_tries = 5
 this.publication_lock_wait_s = 10
 
+// Name of YAML file that contains global pinning information to use during the build.
+// Packages that appear in this file will be pinned to the version indicated.
+this.version_pins_file = "version_pins.yml"
+
 node(LABEL) {
 
     this.OSname = null
@@ -75,6 +79,8 @@ node(LABEL) {
     if (this.manifest.channel_URL[-1..-1] == "/") {
         this.manifest.channel_URL = this.manifest.channel_URL[0..-2]
     }
+
+    this.pins_file = readYaml file: "jenkins/${this.version_pins_file}"
 
     // Allow for sharing build_list between stages below.
     this.build_list = []
@@ -193,6 +199,23 @@ node(LABEL) {
             def patchname = "conda_build_2.1.1_substr_fix_py${this.py_maj_version}.patch"
             def full_patchname = "${patches_dir}/${patchname}"
             sh "patch ${filename} ${full_patchname}"
+        }
+
+        // (conda-build 3.x only)
+        // Create and populate environment to be used for pinning reference when
+        // building packages via the --bootstrap flag.
+        // sh "conda create --name pin_env python=${PY_VERSION}"
+        if (CONDA_BUILD_VERSION[0] == "3") {
+            println("Creating environment based on package pin values found \n" +
+            "in ${this.version_pins_file} to use as global version pinnning \n" +
+            "specification.")
+            def env_cmd = "conda create --quiet -n pin_env python=${PY_VERSION}"
+            for (pkg in this.pins_file.packages) {
+                // TODO: Don't let conda components update here.
+                env_cmd = "${env_cmd} ${pkg.tokenize()[0]}=${pkg.tokenize()[1]}"
+            }
+            sh "${env_cmd}"
+            sh "source activate pin_env; conda env list; conda list"
         }
 
         // Install support tools
