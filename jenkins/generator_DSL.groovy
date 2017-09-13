@@ -100,6 +100,7 @@ for (label in labels.trim().tokenize()) {
                 pipelineJob("${suite_name}/${pkg}") {
                     environmentVariables {
                         env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
+                        env("CONDA_BUILD_VERSION", conda_build_version)
                     }
                     parameters {
                         stringParam("label",

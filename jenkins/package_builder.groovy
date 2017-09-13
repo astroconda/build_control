@@ -1,3 +1,7 @@
+// Parameters inherited environment injection.
+//----------------------------------------------------------------------------
+// CONDA_BUILD_VERSION  - Conda-build is installed forced to this version.
+
 this.build_status_file = "${this.parent_workspace}/propagated_build_status"
 
 node(this.label) {
@@ -45,17 +49,7 @@ node(this.label) {
 
             cmd = "conda build"
 
-            // Use channel URL obtained from manifest in build command if
-            // manifest has been culled to allow packages being built to
-            // simply download dependency packages from the publication
-            // channel as needed, rather than build them as part of the
-            // package build session that requires them.
-            def channel_option = "--channel ${this.channel_URL}"
-
             stage("Build") {
-                if (this.cull_manifest == "false") {
-                    channel_option = ""
-                }
                 build_cmd = cmd
                 args = ["--no-test",
                         "--no-anaconda-upload",
@@ -64,8 +58,24 @@ node(this.label) {
                         "--skip-existing",
                         "--override-channels",
                         "--channel defaults",
-                        "${channel_option}",
                         "--dirty"]
+                // Use channel URL obtained from manifest in build command if
+                // manifest has been culled to allow packages being built to
+                // simply download dependency packages from the publication
+                // channel as needed, rather than build them as part of the
+                // package build session that requires them.
+                if (this.cull_manifest == "true") {
+                    args.add("--channel ${this.channel_URL}")
+                }
+                // If conda build 3.x is being used, apply any global package
+                // pin values contained in the 'pin_env' conda environment
+                // created by the dispatch job by using the --bootstrap flag
+                // here.
+                if (CONDA_BUILD_VERSION[0] == "3") {
+                    args.add("--old-build-string")
+                    args.add("--bootstrap pin_env")
+                }
+                // Compose build command string to use in shell call.
                 for (arg in args) {
                     build_cmd = "${build_cmd} ${arg}"
                 }
@@ -90,8 +100,13 @@ node(this.label) {
                             "--python=${this.py_version}",
                             "--numpy=${this.numpy_version}",
                             "--override-channels",
-                            "--channel defaults",
-                            "${channel_option}"]
+                            "--channel defaults"]
+                    if (this.cull_manifest == "true") {
+                        args.add("--channel ${this.channel_URL}")
+                    }
+                    if (CONDA_BUILD_VERSION[0] == "3") {
+                        args.add("--old-build-string")
+                    }
                     for (arg in args) {
                         build_cmd = "${build_cmd} ${arg}"
                     }
