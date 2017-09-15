@@ -5,7 +5,7 @@ repository: 'https://github.com/astroconda/astroconda-contrib'
 channel_URL: 'http://ssb.stsci.edu/astroconda'
 
 # publication_root path needs to be visible from the slave nodes.
-publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-pub-staging'
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda'
 packages:
   - stsci.tools
   - stsci.imagestats
@@ -20,11 +20,13 @@ packages:
   - asdf-standard
   - asdf
   - astroimtools
+  - astroquery
   - asv
   - calcos
   - cfitsio
   - costools
   - crds
+  - cube-tools
   - d2to1
   - drizzle
   - drizzlepac
@@ -42,16 +44,18 @@ packages:
   - htc_utils
   - imexam
   - jwst_coronagraph_visibility
+  - jwst_footprints
   - jwst_gtvt
   - jwxml
   - mosviz
   - nictools
   - opuscoords
-#  - pandokia
+  - pandokia
   - photutils
   - poppy
   - purge_path
   - pyds9
+  - py-expression-eval
   - pyfftw
   - pyobjc-core
   - pyobjc-framework-cocoa
@@ -69,6 +73,7 @@ packages:
   - shunit2
   - specviz
   - specutils
+  - spherical-geometry
   - sphere
   - sphinx_rtd_theme
   - stsci_sphinx_theme
