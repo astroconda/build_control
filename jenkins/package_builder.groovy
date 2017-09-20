@@ -57,7 +57,6 @@ node(this.label) {
                         "--numpy=${this.numpy_version}",
                         "--skip-existing",
                         "--override-channels",
-                        "--channel defaults",
                         "--dirty"]
                 // Use channel URL obtained from manifest in build command if
                 // manifest has been culled to allow packages being built to
@@ -67,6 +66,8 @@ node(this.label) {
                 if (this.cull_manifest == "true") {
                     args.add("--channel ${this.channel_URL}")
                 }
+                args.add("--channel defaults")
+
                 // If conda build 3.x is being used, apply any global package
                 // pin values contained in the 'pin_env' conda environment
                 // created by the dispatch job by using the --bootstrap flag
@@ -99,11 +100,12 @@ node(this.label) {
                     args = ["--test",
                             "--python=${this.py_version}",
                             "--numpy=${this.numpy_version}",
-                            "--override-channels",
-                            "--channel defaults"]
+                            "--override-channels"]
                     if (this.cull_manifest == "true") {
                         args.add("--channel ${this.channel_URL}")
                     }
+                    args.add("--channel defaults")
+
                     if (CONDA_BUILD_VERSION[0] == "3") {
                         args.add("--old-build-string")
                     }
