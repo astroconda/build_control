@@ -21,6 +21,7 @@ packages:
   - asdf
   - astroimtools
   - astropy
+  - astroquery
   - asv
   - calcos
   - cfitsio
@@ -28,6 +29,8 @@ packages:
   - crds
   - cubeviz
   - d2to1
+  - dbus-glib
+  - dbus-python
   - drizzle
   - drizzlepac
   - ds9
@@ -68,6 +71,7 @@ packages:
   - pywcs
   - reftools
   - relic
+  - secretstorage
   - selenium
   - shunit2
   - specviz
