@@ -3,9 +3,11 @@
 // MANIFEST_FILE        - The "release" type; list of recipes/packages to build
 // LABEL                - Node or logical group of build nodes
 // PY_VERSION           - Python version hosted by conda to support the build
+// NUMPY_VERSION        - numpy version used to support the build
 // BUILD_CONTROL_REPO   - Repository holding this & other build system files,
 //                        and manifest files
 // BUILD_CONTROL_BRANCH - Branch to obtain from build control repo
+// BUILD_CONTROL_TAG    - Tag to obtain from build control repo
 // CONDA_VERSION        - First, then the version is forced to this value.
 // CONDA_BUILD_VERSION  - Conda-build is installed forced to this version.
 // CONDA_BASE_URL       - Where to get the conda installer
@@ -214,7 +216,14 @@ node(LABEL) {
         // Create and populate environment to be used for pinning reference when
         // building packages via the --bootstrap flag.
         // sh "conda create --name pin_env python=${PY_VERSION}"
-        if (CONDA_BUILD_VERSION[0] == "3") {
+        this.use_version_pins = false
+        // This test requires script approval for signature:
+        // org.codehaus.groovy.runtime.DefaultGroovyMethods
+        //    hasProperty java.lang.Object java.lang.String
+        if (this.pins_file.hasProperty('packages')) {
+            this.use_version_pins = true
+        }
+        if (CONDA_BUILD_VERSION[0] == "3" && this.use_version_pins) {
             println("Creating environment based on package pin values found \n" +
             "in ${this.version_pins_file} to use as global version pinnning \n" +
             "specification.")
@@ -236,9 +245,9 @@ node(LABEL) {
     stage("Generate build list") {
         // Generate a filtered, optionally culled, & dependency-ordered list
         // of available package recipes.
-        def culled_option = "--culled"
-        if (this.cull_manifest == "false") {
-            culled_option = ""
+        def culled_option = ""
+        if (this.cull_manifest) {
+            culled_option = "--culled"
         }
         def build_list_file = "build_list"
         cmd = "rambo"
@@ -266,15 +275,24 @@ node(LABEL) {
     stage("Build packages") {
         for (pkg in this.build_list) {
             build job: pkg,
-              parameters:
-                [string(name: "label", value: env.NODE_NAME),
+              parameters: [
+                 string(name: "label", value: env.NODE_NAME),
                  string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
                  string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
+                 string(name: "build_control_tag", value: BUILD_CONTROL_TAG),
                  string(name: "py_version", value: PY_VERSION),
                  string(name: "numpy_version", value: NUMPY_VERSION),
                  string(name: "parent_workspace", value: env.WORKSPACE),
-                 string(name: "cull_manifest", value: this.cull_manifest),
-                 string(name: "channel_URL", value: this.manifest.channel_URL)],
+                 string(name: "manifest_file", value: MANIFEST_FILE),
+                 [$class: 'BooleanParameterValue',
+                    name: "cull_manifest",
+                   value: this.cull_manifest.toBoolean()],
+                 string(name: "channel_URL", value: this.manifest.channel_URL),
+                 [$class: 'BooleanParameterValue',
+                    name: "use_version_pins",
+                   value: this.use_version_pins.toBoolean()]
+              ]
+              // toBoolean java.lang.Boolean above equires script approval
               propagate: false
         }
         // Set overall status to that propagated from individual jobs.

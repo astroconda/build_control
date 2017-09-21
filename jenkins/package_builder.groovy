@@ -1,4 +1,4 @@
-// Parameters inherited environment injection.
+// Parameters inherited via environment injection at job creation time.
 //----------------------------------------------------------------------------
 // CONDA_BUILD_VERSION  - Conda-build is installed forced to this version.
 
@@ -35,6 +35,7 @@ node(this.label) {
         "parameter numpy_version: ${this.numpy_version}\n" +
         "parameter cull_manifest: ${this.cull_manifest}\n" +
         "parameter channel_URL: ${this.channel_URL}\n" +
+        "parameter use_version_pins: ${this.use_version_pins}\n" +
         "PATH: ${env.PATH}\n" +
         "PYTHONPATH: ${env.PYTHONPATH}\n" +
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
@@ -63,7 +64,8 @@ node(this.label) {
                 // simply download dependency packages from the publication
                 // channel as needed, rather than build them as part of the
                 // package build session that requires them.
-                if (this.cull_manifest == "true") {
+                // Channel arguments are order-dependent.
+                if (this.cull_manifest) {
                     args.add("--channel ${this.channel_URL}")
                 }
                 args.add("--channel defaults")
@@ -74,7 +76,9 @@ node(this.label) {
                 // here.
                 if (CONDA_BUILD_VERSION[0] == "3") {
                     args.add("--old-build-string")
-                    args.add("--bootstrap pin_env")
+                    if (this.use_version_pins == "true") {
+                        args.add("--bootstrap pin_env")
+                    }
                 }
                 // Compose build command string to use in shell call.
                 for (arg in args) {
@@ -101,7 +105,8 @@ node(this.label) {
                             "--python=${this.py_version}",
                             "--numpy=${this.numpy_version}",
                             "--override-channels"]
-                    if (this.cull_manifest == "true") {
+                    // Channel arguments are order-dependent.
+                    if (this.cull_manifest) {
                         args.add("--channel ${this.channel_URL}")
                     }
                     args.add("--channel defaults")

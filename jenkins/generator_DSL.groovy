@@ -127,12 +127,15 @@ for (label in labels.trim().tokenize()) {
                         stringParam("manifest_file",
                                     "manifest_file-DEFAULTVALUE",
                                     "Manifest (release) file to use for the build.")
-                        stringParam("cull_manifest",
-                                    "cull_manifest-DEFAULTVALUE",
+                        booleanParam("cull_manifest",
+                                    false,
                                     "Was the manifest culled as part of dispatch?")
                         stringParam("channel_URL",
                                     "channel_URL-DEFAULTVALUE",
                                     "Publication channel used for culled builds.")
+                        booleanParam("use_version_pins",
+                                    false,
+                                    "Whether or not to use global version pins.")
                     }
                     definition {
                         cps {
