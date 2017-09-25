@@ -212,24 +212,27 @@ node(LABEL) {
             sh "patch ${filename} ${full_patchname}"
         }
 
+        // Determine if version_pins_file has a list of packages to pin.
+        try {
+            this.pins_file.packages
+            this.use_version_pins = "true"
+        } catch(MissingPropertyException) {
+            println("${this.version_pins_file} has no packages list, skipping pin environment creation.")
+            this.use_version_pins = "false"
+        }
+        
         // (conda-build 3.x only)
         // Create and populate environment to be used for pinning reference when
-        // building packages via the --bootstrap flag.
-        // sh "conda create --name pin_env python=${PY_VERSION}"
-        this.use_version_pins = false
-        // This test requires script approval for signature:
-        // org.codehaus.groovy.runtime.DefaultGroovyMethods
-        //    hasProperty java.lang.Object java.lang.String
-        if (this.pins_file.hasProperty('packages')) {
-            this.use_version_pins = true
-        }
-        if (CONDA_BUILD_VERSION[0] == "3" && this.use_version_pins) {
+        // building packages via the --bootstrap flag. Environment creation is done
+        // using the explicit packages and versions in the pin file, with no
+        // dependencies.
+        if (CONDA_BUILD_VERSION[0] == "3" && this.use_version_pins == "true") {
             println("Creating environment based on package pin values found \n" +
             "in ${this.version_pins_file} to use as global version pinnning \n" +
-            "specification.")
-            def env_cmd = "conda create --quiet -n pin_env python=${PY_VERSION}"
+            "specification. Packages to be installed in pin environment:")
+            println(this.pins_file.packages)
+            def env_cmd = "conda create --quiet --no-deps -n pin_env python=${PY_VERSION}"
             for (pkg in this.pins_file.packages) {
-                // TODO: Don't let conda components update here.
                 env_cmd = "${env_cmd} ${pkg.tokenize()[0]}=${pkg.tokenize()[1]}"
             }
             sh "${env_cmd}"
@@ -284,13 +287,9 @@ node(LABEL) {
                  string(name: "numpy_version", value: NUMPY_VERSION),
                  string(name: "parent_workspace", value: env.WORKSPACE),
                  string(name: "manifest_file", value: MANIFEST_FILE),
-                 [$class: 'BooleanParameterValue',
-                    name: "cull_manifest",
-                   value: this.cull_manifest.toBoolean()],
+                 string(name: "cull_manifest", value: this.cull_manifest),
                  string(name: "channel_URL", value: this.manifest.channel_URL),
-                 [$class: 'BooleanParameterValue',
-                    name: "use_version_pins",
-                   value: this.use_version_pins.toBoolean()]
+                 string(name: "use_version_pins", value: this.use_version_pins),
               ]
               // toBoolean java.lang.Boolean above equires script approval
               propagate: false

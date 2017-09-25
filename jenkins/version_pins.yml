@@ -12,5 +12,5 @@
 #   - setuptools can be pinned to an earlier version for all package builds
 #     that happen in a given job suite, allowing them to succeed.
 #
-#packages:
-#  - setuptools 27.2.0
+packages:
+  - setuptools 27.2.0

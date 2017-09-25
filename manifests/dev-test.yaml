@@ -8,8 +8,9 @@ channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-dev-staging'
 packages:
 #  - drizzlepac 
-  - jwst_gtvt
-  - jwst
+#  - jwst_gtvt
+#  - jwst
+  - pandokia
 #  - crds
 #  - cube-tools
 #  - sphinxcontrib-programoutput
