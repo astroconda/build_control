@@ -290,8 +290,7 @@ node(LABEL) {
                  string(name: "cull_manifest", value: this.cull_manifest),
                  string(name: "channel_URL", value: this.manifest.channel_URL),
                  string(name: "use_version_pins", value: this.use_version_pins),
-              ]
-              // toBoolean java.lang.Boolean above equires script approval
+              ],
               propagate: false
         }
         // Set overall status to that propagated from individual jobs.
