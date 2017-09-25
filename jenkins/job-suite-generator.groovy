@@ -23,7 +23,7 @@ node("master") {
 
     stage("Prep") {
 
-        sh "printenv"
+        sh "env | sort"
 
         // Delete any existing job workspace directory contents.
         deleteDir()
