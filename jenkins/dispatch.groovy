@@ -336,5 +336,12 @@ node(LABEL) {
             println("No build artifacts found.")
         }
     }
+
+    stage ("Cleanup") {
+        // Clean up the workspace to conserve disk space. Conda installations
+        // especially consume a fair amount.
+        // The directory deleted is the one named after the jenkins pipeline job.
+        deleteDir()
+    }
 }
 
