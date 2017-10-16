@@ -20,6 +20,17 @@ this.build_control_branch= this.build_control_branch.trim()
 this.build_control_tag = readFileFromWorkspace("VAR-build_control_tag")
 this.build_control_tag = this.build_control_tag.trim()
 
+// Keep a specified number of builds (purging those older upon next
+// job execution) for each independent job that is created. This value is set
+// as one of the updater job's parameters.
+//   Note: Since the _dispatch job is
+// executed at the highest frequency, its saved build logs will not go as far
+// back in time for a given value of builds_to_keep than a similar collection
+// of kept logs for a less frequently built job, a slowly-moving package, for
+// instance.
+println("builds_to_keep: ${builds_to_keep}")
+this.num_builds_to_keep = builds_to_keep.toInteger()
+
 // For each label (OS) in the list provided by the 'labels' job parameter, iterate
 // over each python version provided by the 'py_versions' job parameter, to obtain
 // every combination of OS and python version. Generate a separate job suite for
@@ -54,6 +65,9 @@ for (label in labels.trim().tokenize()) {
                                  "Whether or not package recipes that would generate a " +
                                  "package file name that already exists in the manfest's" +
                                  " channel archive are removed from the build list.")
+                }
+                logRotator {
+                    numToKeep(this.num_builds_to_keep)
                 }
                 println("\n" +
                 "script: ${this.script}\n" +
@@ -101,6 +115,9 @@ for (label in labels.trim().tokenize()) {
                     environmentVariables {
                         env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
                         env("CONDA_BUILD_VERSION", conda_build_version)
+                    }
+                    logRotator {
+                        numToKeep(this.num_builds_to_keep)
                     }
                     parameters {
                         stringParam("label",
