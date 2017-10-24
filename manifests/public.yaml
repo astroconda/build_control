@@ -7,18 +7,11 @@ channel_URL: 'http://ssb.stsci.edu/astroconda'
 # publication_root path needs to be visible from the slave nodes.
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda'
 packages:
-  - stsci.tools
-  - stsci.imagestats
-  - stsci-data-analysis
-  - stsci-hst
-  - stsci
-
-  - verhawk
   - acstools
   - appdirs
   - aprio
-  - asdf-standard
   - asdf
+  - asdf-standard
   - astroimtools
   - astroquery
   - asv
@@ -28,6 +21,8 @@ packages:
   - crds
   - cubeviz
   - d2to1
+  - dbus-glib
+  - dbus-python
   - drizzle
   - drizzlepac
   - ds9
@@ -35,10 +30,10 @@ packages:
   - fitsblender
   - fitsverify
   - ginga
-  - glueviz
   - glue-core
-  - glue-vispy-viewers
   - glue-ginga
+  - glue-vispy-viewers
+  - glueviz
   - gwcs
   - hstcal
   - htc_utils
@@ -50,12 +45,11 @@ packages:
   - mosviz
   - nictools
   - opuscoords
-  - pandokia
   - photutils
   - poppy
   - purge_path
-  - pyds9
   - py-expression-eval
+  - pyds9
   - pyfftw
   - pyobjc-core
   - pyobjc-framework-cocoa
@@ -69,34 +63,40 @@ packages:
   - pywcs
   - reftools
   - relic
+  - secretstorage
   - selenium
   - shunit2
-  - specviz
   - specutils
-  - spherical-geometry
+  - specviz
   - sphere
+  - spherical-geometry
   - sphinx_rtd_theme
-  - stsci_sphinx_theme
   - sphinxcontrib-programoutput
   - stginga
   - stistools
+  - stsci
+  - stsci-data-analysis
+  - stsci-hst
   - stsci.convolve
   - stsci.distutils
   - stsci.image
   - stsci.imagemanip
+  - stsci.imagestats
   - stsci.ndimage
   - stsci.numdisplay
   - stsci.skypac
   - stsci.sphere
   - stsci.sphinxext
   - stsci.stimage
+  - stsci.tools
+  - stsci_sphinx_theme
+  - stsynphot
   - stwcs
   - synphot
-  - stsynphot
+  - verhawk
   - wcstools
-  - webbpsf-data
   - webbpsf
+  - webbpsf-data
   - wfc3tools
   - wfpc2tools
   - xpa
-

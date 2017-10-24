@@ -7,18 +7,11 @@ channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 # publication_root path needs to be visible from the slave nodes.
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda-dev'
 packages:
-  - stsci.tools
-  - stsci.imagestats
-  - stsci-data-analysis
-  - stsci-hst
-  - stsci
-
-  - verhawk
   - acstools
   - appdirs
   - aprio
-  - asdf-standard
   - asdf
+  - asdf-standard
   - astroimtools
   - astropy
   - astroquery
@@ -37,9 +30,9 @@ packages:
   - fftw
   - fitsblender
   - ginga
-  - glueviz
   - glue-core
   - glue-vispy-viewers
+  - glueviz
   - gwcs
   - hstcal
   - htc_utils
@@ -52,7 +45,6 @@ packages:
   - mosviz
   - nictools
   - opuscoords
-  - pandokia
   - photutils
   - poppy
   - purge_path
@@ -74,30 +66,35 @@ packages:
   - secretstorage
   - selenium
   - shunit2
-  - specviz
   - specutils
+  - specviz
   - spherical-geometry
   - sphinx_rtd_theme
   - sphinxcontrib-programoutput
   - stginga
   - stistools
+  - stsci
+  - stsci-data-analysis
+  - stsci-hst
   - stsci.convolve
   - stsci.distutils
   - stsci.image
   - stsci.imagemanip
+  - stsci.imagestats
   - stsci.ndimage
   - stsci.numdisplay
   - stsci.skypac
   - stsci.sphere
   - stsci.sphinxext
   - stsci.stimage
+  - stsci.tools
+  - stsynphot
   - stwcs
   - synphot
-  - stsynphot
+  - verhawk
   - wcstools
-  - webbpsf-data
   - webbpsf
+  - webbpsf-data
   - wfc3tools
   - wfpc2tools
   - xpa
-
