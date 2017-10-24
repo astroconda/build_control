@@ -43,11 +43,13 @@ packages:
   - jwst_gtvt
   - jwxml
   - mosviz
+  - namedlist
   - nictools
   - opuscoords
   - photutils
   - poppy
   - purge_path
+  - py-expression-eval
   - pyds9
   - pyfftw
   - pymssql
