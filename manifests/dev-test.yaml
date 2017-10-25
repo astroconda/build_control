@@ -7,10 +7,11 @@ channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 # publication_root path needs to be visible from the slave nodes.
 publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-dev-staging'
 packages:
+  - py-expression-eval
 #  - drizzlepac 
 #  - jwst_gtvt
 #  - jwst
-  - pandokia
+#  - pandokia
 #  - crds
 #  - cube-tools
 #  - sphinxcontrib-programoutput

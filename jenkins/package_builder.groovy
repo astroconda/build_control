@@ -14,6 +14,10 @@ node(this.label) {
         env.PYTHONUNBUFFERED = "true"
         def time = new Date()
 
+        // Use existing isolated home directory unique to this build provided
+        // by _dispatch.
+        env.HOME = "${env.WORKSPACE}/home"
+
         sh "env | sort"
 
         println("\n" +
