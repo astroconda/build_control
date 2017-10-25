@@ -35,6 +35,10 @@ this.version_pins_file = "version_pins.yml"
 
 node(LABEL) {
 
+    // Delete any existing job workspace directory contents.
+    // The directory deleted is the one named after the jenkins pipeline job.
+    deleteDir()
+
     this.OSname = null
     def uname = sh(script: "uname", returnStdout: true).trim()
     if (uname == "Darwin") {
@@ -67,10 +71,6 @@ node(LABEL) {
     env.HOME = "${env.WORKSPACE}/home"
 
     sh "env | sort"
-
-    // Delete any existing job workspace directory contents.
-    // The directory deleted is the one named after the jenkins pipeline job.
-    deleteDir()
 
     // Get the manifest and build control files
     git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
