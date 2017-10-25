@@ -62,6 +62,10 @@ node(LABEL) {
     // Make the log files a bit more deterministic
     env.PYTHONUNBUFFERED = "true"
 
+    // Provide an isolated home directory unique to this build.
+    sh "mkdir home"
+    env.HOME = "${env.WORKSPACE}/home"
+
     sh "env | sort"
 
     // Delete any existing job workspace directory contents.
