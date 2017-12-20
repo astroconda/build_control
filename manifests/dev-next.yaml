@@ -1,12 +1,12 @@
 # Recipe repository
-repository: 'https://github.com/astroconda/astroconda-contrib'
-git_ref_spec: 'master'
+repository: 'https://github.com/jhunkeler/astroconda-dev'
+git_ref_spec: 'next'
 
 # Publication channel to consult when determining what packages already exist.
-channel_URL: 'http://ssb.stsci.edu/astroconda'
+channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 
 # publication_root path needs to be visible from the slave nodes.
-publication_root: '/eng/ssb/websites/ssbpublic/astroconda'
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda-dev'
 packages:
   - acstools
   - appdirs
@@ -14,6 +14,7 @@ packages:
   - asdf
   - asdf-standard
   - astroimtools
+  - astropy
   - astroquery
   - asv
   - calcos
@@ -29,21 +30,21 @@ packages:
   - ds9
   - fftw
   - fitsblender
-  - fitsverify
   - ginga
   - glue-core
-  - glue-ginga
   - glue-vispy-viewers
   - glueviz
   - gwcs
   - hstcal
   - htc_utils
   - imexam
+  - jplephem
+  - jwst
   - jwst_coronagraph_visibility
-  - jwst_footprints
   - jwst_gtvt
   - jwxml
   - mosviz
+  - namedlist
   - nictools
   - opuscoords
   - photutils
@@ -52,6 +53,7 @@ packages:
   - py-expression-eval
   - pyds9
   - pyfftw
+  - pymssql
   - pyobjc-core
   - pyobjc-framework-cocoa
   - pyobjc-framework-quartz
@@ -69,7 +71,6 @@ packages:
   - shunit2
   - specutils
   - specviz
-  - sphere
   - spherical-geometry
   - sphinx_rtd_theme
   - sphinxcontrib-programoutput
@@ -90,7 +91,6 @@ packages:
   - stsci.sphinxext
   - stsci.stimage
   - stsci.tools
-  - stsci_sphinx_theme
   - stsynphot
   - stwcs
   - synphot

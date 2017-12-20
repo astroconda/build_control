@@ -38,7 +38,7 @@ node("master") {
         // to parameters used to control the behavior of this job). Compose
         // the URL string used to pass those parameter values to the jobs
         // being triggered via the REST API.
-        params_url = "?"
+        params_url = ""
         params.each {
              key = it.key.toString()
              val = it.value.toString()
@@ -47,7 +47,8 @@ node("master") {
                  index = this.job_param_id.size()
                  param_name = key[index..-1].trim()
                  println(param_name)
-                 params_url = "${params_url}${param_name}=${val}"
+                 params_url = "${params_url}${param_name}=${val}\\&"
+                 println("LOOP params_url: ${params_url}")
              }
         }
 
@@ -62,8 +63,11 @@ node("master") {
         println("Platforms:\n${PLATFORMS}")
         for (platform in PLATFORMS.tokenize()) {
             println("Triggering _dispatch job for ${platform}...")
+            //trigger_url = "http://${url_base}/job/${abs_jobs_folder}/job/${platform}/" +
+            //   "job/_dispatch/buildWithParameters${params_url} " +
+            //   "-u ${USERNAME}:${PASSWORD}"
             trigger_url = "http://${url_base}/job/${abs_jobs_folder}/job/${platform}/" +
-               "job/_dispatch/buildWithParameters${params_url} " +
+               "job/_dispatch/buildWithParameters?${params_url} " +
                "-u ${USERNAME}:${PASSWORD}"
             println(trigger_url)
             sh (script: "curl -s -S -X POST -H ${CRUMB} ${trigger_url}")
