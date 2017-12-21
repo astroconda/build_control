@@ -210,6 +210,7 @@ node(LABEL) {
         // all output under both circumstances.
         def conda_build_version = sh(script: "conda-build --version 2>&1", returnStdout: true).trim()
         def conda_build_maj_ver = conda_build_version.tokenize()[1].tokenize('.')[0]
+        def conda_build_min_ver = conda_build_version.tokenize()[1].tokenize('.')[1]
         if (conda_build_maj_ver == "2") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
             def filename = "${this.conda_install_dir}/lib/python${PY_VERSION}/" +
@@ -219,7 +220,7 @@ node(LABEL) {
             def full_patchname = "${patches_dir}/${patchname}"
             sh "patch ${filename} ${full_patchname}"
         }
-        if (conda_build_maj_ver == "3") {
+        if (conda_build_maj_ver == "3" && conda_build_min_version == "0") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
             def filename = "${this.conda_install_dir}/lib/python${PY_VERSION}/" +
                            "site-packages/conda_build/config.py"
