@@ -47,6 +47,7 @@ for (label in labels.trim().tokenize()) {
                             "build control repo: ${build_control_repo}\n" +
                             "build control branch: ${build_control_branch}\n" +
                             "build control tag: ${build_control_tag}\n" +
+                            "conda installer version: ${conda_installer_version}\n" +
                             "conda version: ${conda_version}\n" +
                             "conda-build version: ${conda_build_version}\n" +
                             "utils_repo: ${utils_repo}\n" +
@@ -81,6 +82,7 @@ for (label in labels.trim().tokenize()) {
                 "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
                 "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +
                 "BUILD_CONTROL_TAG: ${build_control_tag}\n" +
+                "CONDA_INSTALLER_VERSION: ${conda_installer_version}\n" +
                 "CONDA_VERSION: ${conda_version}\n" +
                 "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
                 "CONDA_BASE_URL: ${conda_base_URL}\n" +
@@ -95,6 +97,7 @@ for (label in labels.trim().tokenize()) {
                     env("BUILD_CONTROL_REPO", build_control_repo)
                     env("BUILD_CONTROL_BRANCH", build_control_branch)
                     env("BUILD_CONTROL_TAG", build_control_tag)
+                    env("CONDA_INSTALLER_VERSION", conda_installer_version)
                     env("CONDA_VERSION", conda_version)
                     env("CONDA_BUILD_VERSION", conda_build_version)
                     env("CONDA_BASE_URL", conda_base_URL)
