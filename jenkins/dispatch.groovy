@@ -33,7 +33,17 @@ this.publication_lock_wait_s = 10
 // Packages that appear in this file will be pinned to the version indicated.
 this.version_pins_file = "version_pins.yml"
 
+
 node(LABEL) {
+
+    // Add any supplemental environment vars to the build environment.
+    for (env_var in this.supp_env_vars.trim().tokenize()) {
+        def key = env_var.tokenize("=")[0]
+        def val = env_var.tokenize("=")[1]
+        // env[] assignment requires in-process script approval for signature:
+        // org.codehaus.groovy.runtime.DefaultGroovyMethods putAt java.lang.Object
+        env[key] = val
+    }
 
     // Delete any existing job workspace directory contents.
     // The directory deleted is the one named after the jenkins pipeline job.
@@ -74,6 +84,7 @@ node(LABEL) {
 
     // Get the manifest and build control files
     git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
+
     // If a tag was specified in the job-suite-generator configuration,
     // explicitly check out that tag after cloning the (master) branch,
     // since the 'git' pipeline step does not yet support accessing tags.
@@ -151,7 +162,7 @@ node(LABEL) {
 
         // Get conda recipes
         dir(this.recipes_dir) {
-            git url: this.manifest.repository
+            git branch: this.manifest.git_ref_spec, url: this.manifest.repository
         }
 
         // Get build utilities
@@ -224,7 +235,7 @@ node(LABEL) {
             println("${this.version_pins_file} has no packages list, skipping pin environment creation.")
             this.use_version_pins = "false"
         }
-        
+
         // (conda-build 3.x only)
         // Create and populate environment to be used for pinning reference when
         // building packages via the --bootstrap flag. Environment creation is done
@@ -294,6 +305,7 @@ node(LABEL) {
                  string(name: "cull_manifest", value: this.cull_manifest),
                  string(name: "channel_URL", value: this.manifest.channel_URL),
                  string(name: "use_version_pins", value: this.use_version_pins),
+                 text(name: "supp_env_vars", value: this.supp_env_vars)
               ],
               propagate: false
         }

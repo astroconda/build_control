@@ -6,6 +6,15 @@ this.build_status_file = "${this.parent_workspace}/propagated_build_status"
 
 node(this.label) {
 
+    // Add any supplemental environment vars to the build environment.
+    for (env_var in this.supp_env_vars.trim().tokenize()) {
+        def key = env_var.tokenize("=")[0]
+        def val = env_var.tokenize("=")[1]
+        // env[] assignment requires in-process script approval for signature:
+        // org.codehaus.groovy.runtime.DefaultGroovyMethods putAt java.lang.Object
+        env[key] = val
+    }
+
     dir(this.parent_workspace) {
 
         env.PATH = "${this.parent_workspace}/miniconda/bin/:" + "${env.PATH}"
@@ -40,6 +49,7 @@ node(this.label) {
         "parameter cull_manifest: ${this.cull_manifest}\n" +
         "parameter channel_URL: ${this.channel_URL}\n" +
         "parameter use_version_pins: ${this.use_version_pins}\n" +
+        "parameter supp_env_vars: ${this.supp_env_vars}\n" +
         "PATH: ${env.PATH}\n" +
         "PYTHONPATH: ${env.PYTHONPATH}\n" +
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")

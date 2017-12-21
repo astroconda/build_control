@@ -41,7 +41,6 @@ for (label in labels.trim().tokenize()) {
 
             //-----------------------------------------------------------------------
             // Create a folder to contain the jobs which are created below.
-
             suite_name = "${manifest_file.tokenize(".")[0]}_${label}_py${py_version}_np${numpy_version}"
             folder(suite_name) {
                 description("Build suite generated: ${job_def_generation_time}\n" +
@@ -65,6 +64,10 @@ for (label in labels.trim().tokenize()) {
                                  "Whether or not package recipes that would generate a " +
                                  "package file name that already exists in the manfest's" +
                                  " channel archive are removed from the build list.")
+                    textParam("supp_env_vars",
+                              "",
+                              "List of supplemental environment variables to define " +
+                              "in the build envioronment.")
                 }
                 logRotator {
                     numToKeep(this.num_builds_to_keep)
@@ -108,7 +111,6 @@ for (label in labels.trim().tokenize()) {
 
             //-----------------------------------------------------------------------
             // Generate the series of actual package building jobs.
-
             for(pkg in config.packages) {
 
                 pipelineJob("${suite_name}/${pkg}") {
@@ -153,6 +155,10 @@ for (label in labels.trim().tokenize()) {
                         stringParam("use_version_pins",
                                     "false",
                                     "Whether or not to use global version pins.")
+                        textParam("supp_env_vars",
+                                  "",
+                                  "List of supplemental environment variables to define " +
+                                  "in the build environment.")
                     }
                     definition {
                         cps {
