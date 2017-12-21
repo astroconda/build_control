@@ -6,7 +6,7 @@ git_ref_spec: 'next'
 channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 
 # publication_root path needs to be visible from the slave nodes.
-publication_root: '/eng/ssb/websites/ssbpublic/astroconda-dev'
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-dev-staging'
 packages:
   - acstools
   - appdirs
