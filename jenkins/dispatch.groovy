@@ -220,7 +220,7 @@ node(LABEL) {
             def full_patchname = "${patches_dir}/${patchname}"
             sh "patch ${filename} ${full_patchname}"
         }
-        if (conda_build_maj_ver == "3" && conda_build_min_version == "0") {
+        if (conda_build_maj_ver == "3" && conda_build_min_ver == "0") {
             println("conda-build major version ${conda_build_maj_ver} detected. Applying bugfix patch.")
             def filename = "${this.conda_install_dir}/lib/python${PY_VERSION}/" +
                            "site-packages/conda_build/config.py"
