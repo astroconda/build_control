@@ -73,6 +73,7 @@ node("master") {
         "labels: ${this.labels}\n" +
         "py_versions: ${this.py_versions}\n" +
         "numpy_versions: ${this.numpy_versions}\n" +
+        "conda_installer_version: ${this.conda_insaller_version}\n" +
         "conda_version: ${this.conda_version}\n" +
         "conda_build_version: ${this.conda_build_version}\n" +
         "conda_base_URL: ${this.conda_base_URL}\n" +
