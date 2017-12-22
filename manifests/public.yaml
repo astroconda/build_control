@@ -15,6 +15,7 @@ packages:
   - asdf-standard
   - astroimtools
   - astroquery
+  - asteval
   - asv
   - calcos
   - cfitsio
