@@ -267,7 +267,7 @@ node(LABEL) {
         // Generate a filtered, optionally culled, & dependency-ordered list
         // of available package recipes.
         def culled_option = ""
-        if (this.cull_manifest) {
+        if (this.cull_manifest == "true") {
             culled_option = "--culled"
         }
         def build_list_file = "build_list"
@@ -353,6 +353,50 @@ node(LABEL) {
             }
         } else {
             println("No build artifacts found.")
+        }
+    }
+
+    // If spec file generation was requested at trigger time, generate one.
+    // Create a conda environment containing all packages specified in the manifest.
+    specfile_type = ""
+    try {
+        specfile_type = this.manifest.specfile_type
+    } catch(all) {
+        println("specfile_type not found in manifest. Not creating spec file.")
+    }
+
+    specfile_output = ""
+    try {
+        specfile_output = this.manifest.specfile_output
+    } catch(all) {
+        println("specfile_output not found in manifest. Not creating spec file.")
+        // prepare to skip specfile_creation
+        specfile_type = "NONE"
+    }
+
+    if (specfile_type == "jwstdp") {
+        stage("Create spec file") {
+            // If an 'ASCO_GIT_REV_jwst' has been defined, use it to crate the spec file name
+            // otherwise, just use the latest package and leave out the version from the spec
+            // file name.
+            package_name = "jwst"
+            jwst_git_rev = sh(script: "echo \$ASCO_GIT_REV_jwst", returnStdout: true).trim()
+            if (jwst_git_rev != "") {
+                package_name = "${package_name}=${jwst_git_rev}.dev0"
+            } else {
+                jwst_git_rev = new Date().format("yyyyMMdd:HHmm")
+            }
+            cmd = "conda create -n spec -q -y -c ${this.manifest.channel_URL} -c defaults python=${PY_VERSION} ${package_name}"
+            sh(script: cmd)
+
+            short_plat = CONDA_PLATFORM.tokenize("-")[0]
+            //short_py_ver = PY_VERSION.replaceAll(".", "")
+            short_py_ver = "${PY_VERSION[0]}${PY_VERSION[2]}"
+            specfile_name = "${specfile_type}-${jwst_git_rev}-${short_plat}-py${short_py_ver}.00.txt"
+            //outdir = "/eng/ssb/websites/ssbpublic/astroconda-releases-staging"
+            outdir = specfile_output
+            outfile = "${outdir}/${specfile_name}"
+            sh(script: "conda list -n spec --explicit > ${outfile}")
         }
     }
 

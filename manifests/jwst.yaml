@@ -6,6 +6,16 @@ git_ref_spec: 'jwst_parameterized_rev'
 channel_URL: 'http://ssb.stsci.edu/astroconda-dev'
 
 # publication_root path needs to be visible from the slave nodes.
-publication_root: '/eng/ssb/websites/ssbpublic/astroconda-j-dev-testing'
+publication_root: '/eng/ssb/websites/ssbpublic/astroconda-dev'
+
+# conda environment spec file generation is only performed if this field
+# is populated.  Allowed values are:
+# 'jwstdp' - JWST Data processing release
+# 'hstdp'  - HST Data processing release
+specfile_type: 'jwstdp'
+
+# Output location for produced environment spec files
+specfile_output: '/eng/ssb/websites/ssbpublic/astroconda-releases-staging'
+
 packages:
   - jwst
