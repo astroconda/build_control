@@ -13,6 +13,7 @@ packages:
   - aprio
   - asdf
   - asdf-standard
+  - asteval
   - astroimtools
   - astropy
   - astroquery
@@ -68,6 +69,7 @@ packages:
   - relic
   - secretstorage
   - selenium
+  - sextractor
   - shunit2
   - specutils
   - specviz
