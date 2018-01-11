@@ -1,18 +1,18 @@
 // Parameters inherited from the calling script via environment injection.
 //----------------------------------------------------------------------------
-// MANIFEST_FILE        - The "release" type; list of recipes/packages to build
-// LABEL                - Node or logical group of build nodes
-// PY_VERSION           - Python version hosted by conda to support the build
-// NUMPY_VERSION        - numpy version used to support the build
-// BUILD_CONTROL_REPO   - Repository holding this & other build system files,
-//                        and manifest files
-// BUILD_CONTROL_BRANCH - Branch to obtain from build control repo
-// BUILD_CONTROL_TAG    - Tag to obtain from build control repo
+// MANIFEST_FILE           - The "release" type; list of recipes/packages to build
+// LABEL                   - Node or logical group of build nodes
+// PY_VERSION              - Python version hosted by conda to support the build
+// NUMPY_VERSION           - numpy version used to support the build
+// BUILD_CONTROL_REPO      - Repository holding this & other build system files,
+//                           and manifest files
+// BUILD_CONTROL_BRANCH    - Branch to obtain from build control repo
+// BUILD_CONTROL_TAG       - Tag to obtain from build control repo
 // CONDA_INSTALLER_VERSION - Conda installer version to use
-// CONDA_VERSION        - conda version is forced to this value
-// CONDA_BUILD_VERSION  - Conda-build is installed forced to this version.
-// CONDA_BASE_URL       - Where to get the conda installer
-// UTILS_REPO           - Repository holding support utilities
+// CONDA_VERSION           - conda version is forced to this value
+// CONDA_BUILD_VERSION     - Conda-build is installed forced to this version.
+// CONDA_BASE_URL          - Where to get the conda installer
+// UTILS_REPO              - Repository holding support utilities
 
 // Directories to create within the workspace
 this.utils_dir = "utils"
@@ -83,8 +83,12 @@ node(LABEL) {
 
     sh "env | sort"
 
-    // Get the manifest and build control files
+    // Get the build control files
     git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
+
+    // Get manifests by cloning the submodule
+    sh(script: "git submodule init")
+    sh(script: "git submodule update")
 
     // If a tag was specified in the job-suite-generator configuration,
     // explicitly check out that tag after cloning the (master) branch,
