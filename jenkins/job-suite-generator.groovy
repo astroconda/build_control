@@ -29,7 +29,9 @@ node("master") {
         deleteDir()
 
         // Clone the manifests repository.
-        git url: manifest_repo, relativeTargetDir: "manifests"
+        dir ("manifests") {
+            git url: manifest_repo
+        }
 
         // Get the git repo and branch values used to obtain this and other
         // build_control scripts so they may be passed to the jobDSL script
@@ -102,7 +104,7 @@ node("master") {
         // (handled by the job that reads this pipeline script) into the actual
         // workspace of this job so the jobDsl call below will be able to find
         // what it needs.
-        sh "cp -r ${env.WORKSPACE}@script/* ."
+        sh "cp -r ${env.WORKSPACE}@script/. ."
     }
 
     stage("Spawn job definition") {
