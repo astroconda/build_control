@@ -1,13 +1,20 @@
-// Job generator script. Uses Job-DSL plugin API.
-
-// Third party YAML parsing class. Obtain from URL below before use.
+// Job generator script. Uses Job-DSL plugin API.  // Third party YAML parsing class. Obtain from URL below before use.
 // https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar
 import org.yaml.snakeyaml.Yaml
 
 def yaml = new Yaml()
-def config = yaml.load(readFileFromWorkspace("manifests/${manifest_file}"))
-def job_def_generation_time = new Date()
+this.manifest_data_raw = readFileFromWorkspace("manifests/${manifest_file}")
+println("\n\nmanifest_data_raw:\n ${this.manifest_data_raw}")
+def config = yaml.load(manifest_data_raw)
 
+// Add delimiters so that multi-line data may be incorporated into downstream
+// build jobs as an environment variable value.
+this.manifest_data = ""
+for (line in this.manifest_data_raw.tokenize('\n')) {
+   this.manifest_data = "${this.manifest_data}${line} \\\\n"  //works
+}
+
+def job_def_generation_time = new Date()
 
 this.script = "dispatch.groovy"
 
@@ -91,6 +98,7 @@ for (label in labels.trim().tokenize()) {
                     env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
                     env("SCRIPT", this.script)
                     env("MANIFEST_FILE", manifest_file)
+                    env("MANIFEST_DATA", this.manifest_data)
                     env("LABEL", label)
                     env("PY_VERSION", py_version)
                     env("NUMPY_VERSION", numpy_version)

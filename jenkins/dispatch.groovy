@@ -1,6 +1,7 @@
 // Parameters inherited from the calling script via environment injection.
 //----------------------------------------------------------------------------
 // MANIFEST_FILE           - The "release" type; list of recipes/packages to build
+// MANIFEST_DATA           - Content of manifest file used in creating this job.
 // LABEL                   - Node or logical group of build nodes
 // PY_VERSION              - Python version hosted by conda to support the build
 // NUMPY_VERSION           - numpy version used to support the build
@@ -97,10 +98,11 @@ node(LABEL) {
         sh(script: "git checkout tags/${BUILD_CONTROL_TAG}")
     }
 
-    this.manifest = readYaml file: "manifests/${MANIFEST_FILE}"
-    if (this.manifest.channel_URL[-1..-1] == "/") {
-        this.manifest.channel_URL = this.manifest.channel_URL[0..-2]
-    }
+    // Turn multi-line env var delimiters into simple newlines for
+    // correct parsing by readYaml.
+    manifest_data = MANIFEST_DATA.replaceAll(" \\\\n", "\n")
+    println("\nmanifest_data:\n${manifest_data}")
+    this.manifest = readYaml text: manifest_data
 
     this.pins_file = readYaml file: "jenkins/${this.version_pins_file}"
 
