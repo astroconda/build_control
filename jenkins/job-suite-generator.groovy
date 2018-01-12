@@ -28,6 +28,9 @@ node("master") {
         // Delete any existing job workspace directory contents.
         deleteDir()
 
+        // Clone the manifests repository.
+        git url: manifest_repo, relativeTargetDir: "manifests"
+
         // Get the git repo and branch values used to obtain this and other
         // build_control scripts so they may be passed to the jobDSL script
         // that gets invoked at the bottom of this script. Vars harvested from

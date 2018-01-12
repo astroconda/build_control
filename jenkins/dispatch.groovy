@@ -87,10 +87,6 @@ node(LABEL) {
     // Get the build control files
     git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
 
-    // Get manifests by cloning the submodule
-    sh(script: "git submodule init")
-    sh(script: "git submodule update")
-
     // If a tag was specified in the job-suite-generator configuration,
     // explicitly check out that tag after cloning the (master) branch,
     // since the 'git' pipeline step does not yet support accessing tags.
