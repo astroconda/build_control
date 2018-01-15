@@ -100,6 +100,11 @@ node(LABEL) {
     println("\nmanifest_data:\n${manifest_data}")
     this.manifest = readYaml text: manifest_data
 
+    // Write manifest data to file
+    dir("manifests") {
+      writeFile file: MANIFEST_FILE, text: manifest_data, encoding: "UTF-8"
+    }
+
     this.pins_file = readYaml file: "jenkins/${this.version_pins_file}"
 
     // Allow for sharing build_list between stages below.
