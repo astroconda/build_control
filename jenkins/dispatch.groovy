@@ -19,8 +19,6 @@
 this.utils_dir = "utils"
 this.recipes_dir = "conda-recipes"
 
-this.build_status_file = "propagated_build_status"
-
 // The conda installer script to use for various <OS><py_version> combinations.
 this.conda_installers  = ["Linux-py2":"Miniconda2-${CONDA_INSTALLER_VERSION}-Linux-x86_64.sh",
                           "Linux-py3":"Miniconda3-${CONDA_INSTALLER_VERSION}-Linux-x86_64.sh",
@@ -294,36 +292,54 @@ node(LABEL) {
         this.build_list = build_list_text.trim().tokenize()
         println("Build list:")
         println(build_list_text)
-
-        // Write build status file to facilitate build status propagation
-        // from child jobs.
-        sh "echo SUCCESS > ${this.build_status_file}"
     }
 
     stage("Build packages") {
+        overall_result = "SUCCESS"
+        build_objs = [:]
+        def build_obj = null
         for (pkg in this.build_list) {
-            build job: pkg,
-              parameters: [
-                 string(name: "label", value: env.NODE_NAME),
-                 string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
-                 string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
-                 string(name: "build_control_tag", value: BUILD_CONTROL_TAG),
-                 string(name: "py_version", value: PY_VERSION),
-                 string(name: "numpy_version", value: NUMPY_VERSION),
-                 string(name: "parent_workspace", value: env.WORKSPACE),
-                 string(name: "manifest_file", value: MANIFEST_FILE),
-                 string(name: "cull_manifest", value: this.cull_manifest),
-                 string(name: "channel_URL", value: this.manifest.channel_URL),
-                 string(name: "use_version_pins", value: this.use_version_pins),
-                 text(name: "supp_env_vars", value: this.supp_env_vars)
-              ],
-              propagate: false
+            build_objs[pkg] = build(
+                job: pkg,
+                parameters: [
+                  string(name: "label", value: env.NODE_NAME),
+                  string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
+                  string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
+                  string(name: "build_control_tag", value: BUILD_CONTROL_TAG),
+                  string(name: "py_version", value: PY_VERSION),
+                  string(name: "numpy_version", value: NUMPY_VERSION),
+                  string(name: "parent_workspace", value: env.WORKSPACE),
+                  string(name: "manifest_file", value: MANIFEST_FILE),
+                  string(name: "cull_manifest", value: this.cull_manifest),
+                  string(name: "channel_URL", value: this.manifest.channel_URL),
+                  string(name: "use_version_pins", value: this.use_version_pins),
+                  text(name: "supp_env_vars", value: this.supp_env_vars)
+                ],
+                propagate: false)
+            // Ratchet up the overall build result status if necessary.
+            // Set overall status to the worst propagated from individual package jobs.
+            // 'FAILURE' is worse than 
+            // 'UNSTABLE' which is worse than 
+            // 'SUCCESS'.
+            def result = build_objs[pkg].result
+            if (result != "SUCCESS") {
+                if (result == "FAILURE") {
+                    overall_result = "FAILURE"
+                }
+                if (result == "UNSTABLE" && overall_result == "SUCCESS") {
+                    overall_result = "UNSTABLE"
+                }
+            }
         }
-        // Set overall status to that propagated from individual jobs.
-        // This will be the most severe status encountered in all sub jobs.
-        def tmp_status = readFile this.build_status_file
-        tmp_status = tmp_status.trim()
-        currentBuild.result = tmp_status
+        currentBuild.result = overall_result
+
+        // Print summary of results from each package build job.
+        def results_msg = ""
+        build_objs.each{
+            key, value -> results_msg = "${results_msg}${key} : ${value.result}\n"
+        }
+        println(results_msg)
+        currentBuild.description = results_msg
     }
 
     stage ("Publish") {
@@ -332,20 +348,19 @@ node(LABEL) {
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
                returnStatus: true)
-        def rsync_cmd = "rsync -avzr --ignore-existing"
+        def rsync_cmd = "rsync -avzr"
         if (artifacts_present == 0) {
             sh(script: "${rsync_cmd} ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
-            def lockfile = "${publication_path}/LOCK-Jenkins"
-            def file = new File(lockfile)
             def tries_remaining = this.max_publication_tries
-            if (file.exists()) {
+            def lockfile = "${publication_path}/LOCK-Jenkins"
+            if ( fileExists(lockfile) ) {
                 println("Lockfile already exists, waiting for it to be released...")
                 while ( tries_remaining > 0) {
                     println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
                     sleep(this.publication_lock_wait_s)
-                    if ( !file.exists() ) {
+                    if ( !fileExists(file) ) {
                         break
                     }
                     tries_remaining--
@@ -397,10 +412,8 @@ node(LABEL) {
             sh(script: cmd)
 
             short_plat = CONDA_PLATFORM.tokenize("-")[0]
-            //short_py_ver = PY_VERSION.replaceAll(".", "")
             short_py_ver = "${PY_VERSION[0]}${PY_VERSION[2]}"
             specfile_name = "${specfile_type}-${jwst_git_rev}-${short_plat}-py${short_py_ver}.00.txt"
-            //outdir = "/eng/ssb/websites/ssbpublic/astroconda-releases-staging"
             outdir = specfile_output
             outfile = "${outdir}/${specfile_name}"
             sh(script: "conda list -n spec --explicit > ${outfile}")
