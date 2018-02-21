@@ -2,8 +2,6 @@
 //----------------------------------------------------------------------------
 // CONDA_BUILD_VERSION  - Conda-build is installed forced to this version.
 
-this.build_status_file = "${this.parent_workspace}/propagated_build_status"
-
 node(this.label) {
 
     // Add any supplemental environment vars to the build environment.
@@ -19,7 +17,7 @@ node(this.label) {
 
         env.PATH = "${this.parent_workspace}/miniconda/bin/:" + "${env.PATH}"
         env.PYTHONPATH = ""
-        // Make the log files a bit more deterministic
+        // Make the output a bit more deterministic
         env.PYTHONUNBUFFERED = "true"
         def time = new Date()
 
@@ -53,9 +51,6 @@ node(this.label) {
         "PATH: ${env.PATH}\n" +
         "PYTHONPATH: ${env.PYTHONPATH}\n" +
         "PYTHONUNBUFFERED: ${env.PYTHONUNBUFFERED}\n")
-
-        def build_status = readFile this.build_status_file
-        build_status = build_status.trim()
 
         // In the directory common to all package build jobs,
         // run conda build --dirty for this package to use any existing work
@@ -103,11 +98,6 @@ node(this.label) {
                           returnStatus: true)
                 if (stat != 0) {
                     currentBuild.result = "FAILURE"
-                    // Ratchet up the overall build status severity if this
-                    // is the most severe seen so far.
-                    if (build_status != "FAILURE") {
-                            sh "echo ${currentBuild.result} > ${this.build_status_file}"
-                    }
                 }
             }
 
@@ -119,7 +109,7 @@ node(this.label) {
                             "--python=${this.py_version}",
                             "--numpy=${this.numpy_version}",
                             "--override-channels"]
-                    // Channel arguments are order-dependent.
+                    // NOTE: Channel arguments are order-sensitive.
                     if (this.cull_manifest) {
                         args.add("--channel ${this.channel_URL}")
                     }
@@ -134,12 +124,30 @@ node(this.label) {
                     stat = 999
                     stat = sh(script: "${build_cmd} ${env.JOB_BASE_NAME}",
                               returnStatus: true)
+
                     if (stat != 0) {
                         currentBuild.result = "UNSTABLE"
                         // Ratchet up the overall build status severity if this
-                        // is the most severe seen so far.
-                        if (build_status == "SUCCESS") {
-                            sh "echo ${currentBuild.result} > ${this.build_status_file}"
+                        // is the most severe status seen so far.
+                        // Also, delete the package file so that it cannot be
+                        // published. The package file to remove is the most
+                        // recent .tar.bz2 file in the build output directory.
+                        bld_dir = "${this.parent_workspace}/miniconda/conda-bld"
+
+                        // Get the most recently created package name.
+                        def plat_dir = "${bld_dir}/linux-64"
+                        if (!fileExists(plat_dir)) {
+                            plat_dir = "${bld_dir}/osx-64"
+                        }
+                        cmd = "ls -t ${plat_dir}/*.tar.bz2 | head -n1"
+                        def pkg_full_name = sh(script: cmd, returnStdout: true)
+
+                        println("Deleting file ${pkg_full_name}")
+                        // Use shell call here because file.exists() and file.delete()
+                        // simply don't work correctly and report no errors to that effect.
+                        stat = sh(script: "rm -f ${pkg_full_name}", returnStatus: true)
+                        if (stat != 0) {
+                            println("ERROR deleting package file ${pkg_full_name}")
                         }
                     }
                 }
