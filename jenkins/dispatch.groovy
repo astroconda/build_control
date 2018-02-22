@@ -360,7 +360,7 @@ node(LABEL) {
                 while ( tries_remaining > 0) {
                     println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
                     sleep(this.publication_lock_wait_s)
-                    if ( !fileExists(file) ) {
+                    if ( !fileExists(lockfile) ) {
                         break
                     }
                     tries_remaining--
