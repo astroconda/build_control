@@ -26,8 +26,12 @@ this.conda_installers  = ["Linux-py2":"Miniconda2-${CONDA_INSTALLER_VERSION}-Lin
                           "MacOSX-py3":"Miniconda3-${CONDA_INSTALLER_VERSION}-MacOSX-x86_64.sh"]
 
 // Values controlling the conda index stage which happens after any packages are created.
-this.max_publication_tries = 5
-this.publication_lock_wait_s = 10
+// Closely timed builds that publish to the same location will require the retry period
+// defined here be long enough to cover the longest expected indexing operation so that
+// the build does not terminate without indexing all packages that were produced between
+// multiple platforms.
+this.max_publication_tries = 10
+this.publication_lock_wait_s = 30
 
 // Name of YAML file that contains global pinning information to use during the build.
 // Packages that appear in this file will be pinned to the version indicated.
