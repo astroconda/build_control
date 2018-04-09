@@ -1,5 +1,7 @@
-// Job generator script. Uses Job-DSL plugin API.  // Third party YAML parsing class. Obtain from URL below before use.
-// https://repo1.maven.org/maven2/org/yaml/snakeyaml/1.17/snakeyaml-1.17.jar
+// TODO: Is there a way to reference this local, shaded class instead of fetching it from an external source
+// using @Grab?
+//import org.jenkinsci.plugins.pipeline.utility.steps.shaded.org.yaml.snakeyaml.Yaml // cannot find.
+@Grab('org.yaml:snakeyaml:1.17')
 import org.yaml.snakeyaml.Yaml
 
 def yaml = new Yaml()
@@ -18,23 +20,13 @@ def job_def_generation_time = new Date()
 
 this.script = "dispatch.groovy"
 
-this.build_control_repo = readFileFromWorkspace("VAR-build_control_repo")
-this.build_control_repo = this.build_control_repo.trim()
-
-this.build_control_branch = readFileFromWorkspace("VAR-build_control_branch")
-this.build_control_branch= this.build_control_branch.trim()
-
-this.build_control_tag = readFileFromWorkspace("VAR-build_control_tag")
-this.build_control_tag = this.build_control_tag.trim()
-
 // Keep a specified number of builds (purging those older upon next
 // job execution) for each independent job that is created. This value is set
 // as one of the updater job's parameters.
-//   Note: Since the _dispatch job is
-// executed at the highest frequency, its saved build logs will not go as far
-// back in time for a given value of builds_to_keep than a similar collection
-// of kept logs for a less frequently built job, a slowly-moving package, for
-// instance.
+//   Note: Since the _dispatch job is executed at the highest frequency,
+// its saved build logs will not go as far back in time for a given value of
+// builds_to_keep than a similar collection of kept logs for a less frequently
+// built job, a slowly-moving package, for instance.
 println("builds_to_keep: ${builds_to_keep}")
 this.num_builds_to_keep = builds_to_keep.toInteger()
 
@@ -42,18 +34,17 @@ this.num_builds_to_keep = builds_to_keep.toInteger()
 // over each python version provided by the 'py_versions' job parameter, to obtain
 // every combination of OS and python version. Generate a separate job suite for
 // each combination.
-for (label in labels.trim().tokenize()) {
-    for (py_version in py_versions.trim().tokenize()) {
-        for (numpy_version in numpy_versions.trim().tokenize()) {
-
+for (label in labels) {
+    for (py_version in py_versions) {
+        for (numpy_version in numpy_versions) {
+     
             //-----------------------------------------------------------------------
             // Create a folder to contain the jobs which are created below.
             suite_name = "${manifest_file.tokenize(".")[0]}_${label}_py${py_version}_np${numpy_version}"
             folder(suite_name) {
                 description("Build suite generated: ${job_def_generation_time}\n" +
                             "build control repo: ${build_control_repo}\n" +
-                            "build control branch: ${build_control_branch}\n" +
-                            "build control tag: ${build_control_tag}\n" +
+                            "build control git_ref: ${build_control_git_ref}\n" +
                             "conda installer version: ${conda_installer_version}\n" +
                             "conda version: ${conda_version}\n" +
                             "conda-build version: ${conda_build_version}\n" +
@@ -87,8 +78,7 @@ for (label in labels.trim().tokenize()) {
                 "PY_VERSION: ${py_version}\n" +
                 "NUMPY_VERSION: ${numpy_version}\n" +
                 "BUILD_CONTROL_REPO: ${build_control_repo}\n" +
-                "BUILD_CONTROL_BRANCH: ${build_control_branch}\n" +
-                "BUILD_CONTROL_TAG: ${build_control_tag}\n" +
+                "BUILD_CONTROL_GIT_REF: ${build_control_git_ref}\n" +
                 "CONDA_INSTALLER_VERSION: ${conda_installer_version}\n" +
                 "CONDA_VERSION: ${conda_version}\n" +
                 "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
@@ -103,8 +93,7 @@ for (label in labels.trim().tokenize()) {
                     env("PY_VERSION", py_version)
                     env("NUMPY_VERSION", numpy_version)
                     env("BUILD_CONTROL_REPO", build_control_repo)
-                    env("BUILD_CONTROL_BRANCH", build_control_branch)
-                    env("BUILD_CONTROL_TAG", build_control_tag)
+                    env("BUILD_CONTROL_GIT_REF", build_control_git_ref)
                     env("CONDA_INSTALLER_VERSION", conda_installer_version)
                     env("CONDA_VERSION", conda_version)
                     env("CONDA_BUILD_VERSION", conda_build_version)
@@ -139,12 +128,9 @@ for (label in labels.trim().tokenize()) {
                         stringParam("build_control_repo",
                                     "build_control_repo-DEFAULTVALUE",
                                     "Repository containing the build system scripts.")
-                        stringParam("build_control_branch",
-                                    "build_control_branch-DEFAULTVALUE",
-                                    "Branch checked out to obtain build system scripts.")
-                        stringParam("build_control_tag",
-                                    "build_control_tag-DEFAULTVALUE",
-                                    "Tag checked out to obtain build system scripts.")
+                        stringParam("build_control_git_ref",
+                                    "build_control_git_ref-DEFAULTVALUE",
+                                    "Git ref to use to obtain the build system scripts.")
                         stringParam("py_version",
                                     "py_version-DEFAULTVALUE",
                                     "python version to use")
