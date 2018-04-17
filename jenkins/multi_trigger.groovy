@@ -50,14 +50,23 @@ node('master') {
         platcount = build_objs.size()
         successes = 0
         build_objs.each {
-            key, value -> results_msg = "${results_msg}${key} build #: ${value.number}, result: ${value.result}\n"
-            if (value.result == "SUCCESS") {
-                successes++
-            }
-            for (pkg_result in value.description.split('\n')) {
-                results_msg = "${results_msg}${pkg_result}\n"
-            }
-            results_msg = "${results_msg}\n"
+            key, value ->
+                if (value.result == "SUCCESS") {
+                    successes++
+                }
+                // Check for early abort of _dispatch job before description exists.
+                if (value.description == null) {
+                    result = "ERROR"
+                } else {
+                    result = value.result
+                }
+                results_msg = "${results_msg}${key} build #: ${value.number}, result: ${result}\n"
+                if (value.description != null) {
+                    for (pkg_result in value.description.split('\n')) {
+                        results_msg = "${results_msg}${pkg_result}\n"
+                    }
+                }
+                results_msg = "${results_msg}\n"
         }
         println(results_msg)
         def recipients = mail_recipients.replaceAll("\n", " ").trim()
@@ -68,5 +77,4 @@ node('master') {
             println("e-mail not sent: No recipients specified.")
         }
     }
-
 }
