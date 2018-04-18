@@ -7,8 +7,7 @@
 // NUMPY_VERSION           - numpy version used to support the build
 // BUILD_CONTROL_REPO      - Repository holding this & other build system files,
 //                           and manifest files
-// BUILD_CONTROL_BRANCH    - Branch to obtain from build control repo
-// BUILD_CONTROL_TAG       - Tag to obtain from build control repo
+// BUILD_CONTROL_GIT_REF   - Git ref to use in obtaining build control scripts
 // CONDA_INSTALLER_VERSION - Conda installer version to use
 // CONDA_VERSION           - conda version is forced to this value
 // CONDA_BUILD_VERSION     - Conda-build is installed forced to this version.
@@ -87,13 +86,11 @@ node(LABEL) {
     sh "env | sort"
 
     // Get the build control files
-    git branch: BUILD_CONTROL_BRANCH, url: BUILD_CONTROL_REPO
+    git url: BUILD_CONTROL_REPO
 
-    // If a tag was specified in the job-suite-generator configuration,
-    // explicitly check out that tag after cloning the (master) branch,
-    // since the 'git' pipeline step does not yet support accessing tags.
-    if (BUILD_CONTROL_TAG != "") {
-        sh(script: "git checkout tags/${BUILD_CONTROL_TAG}")
+    // The 'git' pipeline step does not yet support accessing tags.
+    if (BUILD_CONTROL_GIT_REF != "") {
+        sh(script: "git checkout ${BUILD_CONTROL_GIT_REF}")
     }
 
     // Turn multi-line env var delimiters into simple newlines for
@@ -141,8 +138,7 @@ node(LABEL) {
         "CONDA_BUILD_VERSION: ${CONDA_BUILD_VERSION}\n" +
         "CONDA_BASE_URL: ${CONDA_BASE_URL}\n" +
         "BUILD_CONTROL_REPO: ${BUILD_CONTROL_REPO}\n" +
-        "BUILD_CONTROL_BRANCH: ${BUILD_CONTROL_BRANCH}\n" +
-        "BUILD_CONTROL_TAG: ${BUILD_CONTROL_TAG}\n" +
+        "BUILD_CONTROL_GIT_REF: ${BUILD_CONTROL_GIT_REF}\n" +
         "UTILS_REPO: ${UTILS_REPO}\n" +
         "  Trigger parameters:\n" +
         "this.cull_manifest: ${this.cull_manifest}\n" +
@@ -308,8 +304,7 @@ node(LABEL) {
                 parameters: [
                   string(name: "label", value: env.NODE_NAME),
                   string(name: "build_control_repo", value: BUILD_CONTROL_REPO),
-                  string(name: "build_control_branch", value: BUILD_CONTROL_BRANCH),
-                  string(name: "build_control_tag", value: BUILD_CONTROL_TAG),
+                  string(name: "build_control_git_ref", value: BUILD_CONTROL_GIT_REF),
                   string(name: "py_version", value: PY_VERSION),
                   string(name: "numpy_version", value: NUMPY_VERSION),
                   string(name: "parent_workspace", value: env.WORKSPACE),
