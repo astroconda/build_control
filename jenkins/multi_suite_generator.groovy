@@ -65,12 +65,12 @@ node("master") {
         add_params.put('build_control_git_ref', build_control_git_ref)
 
         updates.keySet().each { key, val ->
-            manifest_file = "${key}.yaml"
-            add_params.put('manifest_file', manifest_file)
+            add_params.put('manifest_basename', key)
             add_params.put('labels', updates[key].labels)
             add_params.put('py_versions', updates[key].py_versions)
             add_params.put('numpy_versions', updates[key].numpy_versions)
-            println("Generating job suite for: ${this.manifest_file}")
+            add_params.put('trigger_schedule', updates[key].trigger_schedule)
+            println("Generating job suite for: ${key}")
             jobDsl targets: [this.dsl_script].join("\n"),
                    lookupStrategy: "SEED_JOB",
                    additionalParameters: add_params,

@@ -4,8 +4,10 @@
 @Grab('org.yaml:snakeyaml:1.17')
 import org.yaml.snakeyaml.Yaml
 
+this.manifest_file = "${manifest_basename}.yaml"
+
 def yaml = new Yaml()
-this.manifest_data_raw = readFileFromWorkspace("manifests/${manifest_file}")
+this.manifest_data_raw = readFileFromWorkspace("manifests/${this.manifest_file}")
 println("\n\nmanifest_data_raw:\n ${this.manifest_data_raw}")
 def config = yaml.load(manifest_data_raw)
 
@@ -18,7 +20,8 @@ for (line in this.manifest_data_raw.tokenize('\n')) {
 
 def job_def_generation_time = new Date()
 
-this.script = "dispatch.groovy"
+this.dispatch_script = "dispatch.groovy"
+this.trigger_script = "multi_trigger.groovy"
 
 // Keep a specified number of builds (purging those older upon next
 // job execution) for each independent job that is created. This value is set
@@ -34,13 +37,17 @@ this.num_builds_to_keep = builds_to_keep.toInteger()
 // over each python version provided by the 'py_versions' job parameter, to obtain
 // every combination of OS and python version. Generate a separate job suite for
 // each combination.
+this.platforms = []
 for (label in labels) {
     for (py_version in py_versions) {
         for (numpy_version in numpy_versions) {
-     
+
+            // Compose platforms list for trigger job generation after this loop.
+            this.platforms.add("${manifest_basename}_${label}_py${py_version}_np${numpy_version}")
+
             //-----------------------------------------------------------------------
             // Create a folder to contain the jobs which are created below.
-            suite_name = "${manifest_file.tokenize(".")[0]}_${label}_py${py_version}_np${numpy_version}"
+            suite_name = "${manifest_basename}_${label}_py${py_version}_np${numpy_version}"
             folder(suite_name) {
                 description("Build suite generated: ${job_def_generation_time}\n" +
                             "build control repo: ${build_control_repo}\n" +
@@ -52,10 +59,11 @@ for (label in labels) {
                             "publication_root: ${config.publication_root}")
             }
 
+
             //-----------------------------------------------------------------------
             // Generate the dispatch job that will trigger the chain of package
             // build jobs.
-            pipelineJob("${suite_name}/_${script.tokenize(".")[0]}") {
+            pipelineJob("${suite_name}/_${this.dispatch_script.tokenize(".")[0]}") {
                 // At trigger-time, allow for setting manifest culling behavior.
                 parameters {
                     booleanParam("cull_manifest",
@@ -72,7 +80,7 @@ for (label in labels) {
                     numToKeep(this.num_builds_to_keep)
                 }
                 println("\n" +
-                "script: ${this.script}\n" +
+                "script: ${this.dispatch_script}\n" +
                 "MANIFEST_FILE: ${manifest_file}\n" +
                 "LABEL: ${label}\n" +
                 "PY_VERSION: ${py_version}\n" +
@@ -86,7 +94,7 @@ for (label in labels) {
                 "UTILS_REPO: ${utils_repo}\n")
                 environmentVariables {
                     env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
-                    env("SCRIPT", this.script)
+                    env("SCRIPT", this.dispatch_script)
                     env("MANIFEST_FILE", manifest_file)
                     env("MANIFEST_DATA", this.manifest_data)
                     env("LABEL", label)
@@ -102,7 +110,7 @@ for (label in labels) {
                 }
                 definition {
                     cps {
-                        script(readFileFromWorkspace("jenkins/${this.script}"))
+                        script(readFileFromWorkspace("jenkins/${this.dispatch_script}"))
                         sandbox()
                     }
                 }
@@ -170,3 +178,55 @@ for (label in labels) {
         } //end for(numpy_version
     } // end for(py_version
 } // end for(label
+
+
+//-----------------------------------------------------------------------
+// Create trigger job for the manifest being processed.
+platforms_param = this.platforms[0]
+if (this.platforms.size() > 1) {
+    for (platform in this.platforms[1..-1]) {
+        platforms_param = "${platforms_param}\n${platform}"
+    }
+}
+println("Platforms:\n${platforms}")
+
+println("trigger_schedule = ${trigger_schedule}")
+
+pipelineJob("trigger_${manifest_basename}") {
+    parameters {
+        textParam("platforms",
+                  platforms_param,
+                  "The list of platforms which will be triggered by this job.")
+        stringParam("abs_jobs_folder",
+                    "AstroConda",
+                    "Absolute (Jenkins) path to the folder containing jobs to trigger.")
+        booleanParam("cull_manifest",
+                     true,
+                     "Whether or not package recipes that would generate a " +
+                     "package file name that already exists in the manfest's" +
+                     " channel archive are removed from the build list.")
+        textParam("mail_recipients",
+                  this.mail_recipients,
+                  "Whom to pester.")
+    }
+    logRotator {
+        numToKeep(this.num_builds_to_keep)
+    }
+    if (trigger_schedule) {
+        def cronstring = trigger_schedule[0]
+        if (trigger_schedule.size() > 1) {
+            for (cronline in trigger_schedule[1..-1]) {
+                cronstring = "${cronstring}\n${cronline}"
+            }
+        }
+        triggers {
+            cron(cronstring)
+        }
+    }
+    definition {
+        cps {
+            script(readFileFromWorkspace("jenkins/${this.trigger_script}"))
+            sandbox()
+        }
+    }
+}
