@@ -53,6 +53,7 @@ node("master") {
         "conda_build_version: ${this.conda_build_version}\n" +
         "conda_base_URL: ${this.conda_base_URL}\n" +
         "utils_repo: ${this.utils_repo}\n" +
+        "utils_repo_git_ref: ${this.utils_repo_git_ref}\n" +
         "old_jobs_action: ${this.old_jobs_action}\n" +
         "  Other values:\n" +
         "dsl_script: ${this.dsl_script}")
