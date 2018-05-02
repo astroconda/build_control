@@ -140,6 +140,7 @@ node(LABEL) {
         "BUILD_CONTROL_REPO: ${BUILD_CONTROL_REPO}\n" +
         "BUILD_CONTROL_GIT_REF: ${BUILD_CONTROL_GIT_REF}\n" +
         "UTILS_REPO: ${UTILS_REPO}\n" +
+        "UTILS_REPO_GIT_REF: ${UTILS_REPO_GIT_REF}\n" +
         "  Trigger parameters:\n" +
         "this.cull_manifest: ${this.cull_manifest}\n" +
         "  Manifest values:\n" +
@@ -175,6 +176,9 @@ node(LABEL) {
         // Get build utilities
         dir(this.utils_dir) {
             git url: UTILS_REPO
+            if (UTILS_REPO_GIT_REF != "") {
+                sh(script: "git checkout ${UTILS_REPO_GIT_REF}")
+            }
         }
 
         // Check for the availability of a download tool and then use it

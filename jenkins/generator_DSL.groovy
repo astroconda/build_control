@@ -91,7 +91,8 @@ for (label in labels) {
                 "CONDA_VERSION: ${conda_version}\n" +
                 "CONDA_BUILD_VERSION: ${conda_build_version}\n" +
                 "CONDA_BASE_URL: ${conda_base_URL}\n" +
-                "UTILS_REPO: ${utils_repo}\n")
+                "UTILS_REPO: ${utils_repo}\n" +
+                "UTILS_REPO_GIT_REF: ${utils_repo_git_ref}\n")
                 environmentVariables {
                     env("JOB_DEF_GENERATION_TIME", job_def_generation_time)
                     env("SCRIPT", this.dispatch_script)
@@ -107,6 +108,7 @@ for (label in labels) {
                     env("CONDA_BUILD_VERSION", conda_build_version)
                     env("CONDA_BASE_URL", conda_base_URL)
                     env("UTILS_REPO", utils_repo)
+                    env("UTILS_REPO_GIT_REF", utils_repo_git_ref)
                 }
                 definition {
                     cps {
