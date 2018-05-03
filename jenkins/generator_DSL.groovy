@@ -71,6 +71,11 @@ for (label in labels) {
                                  "Whether or not package recipes that would generate a " +
                                  "package file name that already exists in the manfest's" +
                                  " channel archive are removed from the build list.")
+                    booleanParam("filter_nonpython",
+                                 false,
+                                 "Whether or not package without a python dependency are" +
+                                 " skipped as they only need to be built on a single" +
+                                 " platform.")
                     textParam("supp_env_vars",
                               "",
                               "List of supplemental environment variables to define " +

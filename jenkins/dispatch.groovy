@@ -275,19 +275,20 @@ node(LABEL) {
     stage("Generate build list") {
         // Generate a filtered, optionally culled, & dependency-ordered list
         // of available package recipes.
-        def culled_option = ""
-        if (this.cull_manifest == "true") {
-            culled_option = "--culled"
-        }
         def build_list_file = "build_list"
         cmd = "rambo"
         args = ["--platform ${this.CONDA_PLATFORM}",
                 "--python ${PY_VERSION}",
                 "--numpy ${NUMPY_VERSION}",
                 "--manifest manifests/${MANIFEST_FILE}",
-                "--file ${build_list_file}",
-                "${culled_option}",
-                this.recipes_dir]
+                "--file ${build_list_file}"]
+        if (this.cull_manifest == "true") {
+            args.add("--culled")
+        }
+        if (this.filter_nonpython == "true") {
+           args.add("--filter-nonpy")
+        }
+        args.add(this.recipes_dir)
         for (arg in args) {
             cmd = "${cmd} ${arg}"
         }

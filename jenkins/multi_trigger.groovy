@@ -9,21 +9,59 @@ node('master') {
     build_types = []
     
     stage("Trigger") {
-        for (platform in platforms.tokenize()) {
+        platforms = platforms.tokenize().sort().reverse()
+        def os_list = []
+        // Compose list of unique OS values.
+        for (platform in platforms) {
+            os = platform.tokenize("_")[1]
+            if (!os_list.contains(os)) {
+                os_list.add(os)
+            }
+        }
+        // Compose list of master platforms
+        def master_platforms = []
+        for (osval in os_list) {
+            for (platform in platforms) {
+                if (platform.contains(osval)) {
+                    master_platforms.add(platform)
+                    break
+                }
+            }
+        }
+        println("master_platforms: ${master_platforms}")
+
+        for (platform in platforms) {
             build_type = platform.tokenize("_")[0]
+            def platname = platform  // vars referenced within 'tasks' block
+                                     // below must be defined within for loop.
             build_types += build_type
-            def platname = platform  // must be inside for loop
-            println("platname = ${platname}")
+            // Select one platform from each OS to host all package
+            // builds that do not have any python dependencies.
+            // The non-python package builds are identical between the
+            // various python-version-variation job suites, so only
+            // one platform's build is actually necessary on a given OS.
+            // The platform selected for this purpose is called the
+            // 'master' platform and is defined here to be the platform
+            // name that appears first in a reverse lexicographical
+            // sorting of the platform names for a given OS.
+            def filter_nonpython = true
+            if (master_platforms.contains(platname)) {
+                filter_nonpython = false
+            }
             tasks["${platname}"] = {
                 build_objs["${platname}"] = build(
                     job: "/AstroConda/${platname}/_dispatch",
                     parameters: [
                         booleanParam(name: 'cull_manifest',
                                      value: cull_manifest.toBoolean()
+                        ),
+                        booleanParam(name: 'filter_nonpython',
+                                     value: filter_nonpython
                         )
                     ],
                     propagate: false)
             } // end tasks
+            is_master = false
         } // end for
     }
     
