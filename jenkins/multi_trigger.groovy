@@ -57,6 +57,9 @@ node('master') {
                         ),
                         booleanParam(name: 'filter_nonpython',
                                      value: filter_nonpython
+                        ),
+                        textParam(name: 'supp_env_vars',
+                                  value: supp_env_vars
                         )
                     ],
                     propagate: false)

@@ -212,6 +212,10 @@ pipelineJob("trigger_${manifest_basename}") {
                      "Whether or not package recipes that would generate a " +
                      "package file name that already exists in the manfest's" +
                      " channel archive are removed from the build list.")
+        textParam("supp_env_vars",
+                  "",
+                  "List of supplemental environment variables to define in " +
+                  "the build envioronment.")
         textParam("mail_recipients",
                   this.mail_recipients,
                   "Whom to pester.")
