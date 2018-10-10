@@ -216,6 +216,12 @@ pipelineJob("trigger_${manifest_basename}") {
                   "",
                   "List of supplemental environment variables to define in " +
                   "the build envioronment.")
+        textParam("non_python_pkg_platform",
+                  "py3.6",
+                  "Only platforms with this python version in their name will " + 
+                  "be used to host the building of non-python packages. This " +
+                  "prevents non-python packages from being built multiple " +
+                  "times unnecessarily.")
         textParam("mail_recipients",
                   this.mail_recipients,
                   "Whom to pester.")
