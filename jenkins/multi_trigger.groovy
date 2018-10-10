@@ -18,17 +18,39 @@ node('master') {
                 os_list.add(os)
             }
         }
-        // Compose list of master platforms
-        def master_platforms = []
-        for (osval in os_list) {
-            for (platform in platforms) {
-                if (platform.contains(osval)) {
-                    master_platforms.add(platform)
-                    break
-                }
+
+        // Determine if the master platform has been overridden
+        // by the specification of a valid platform name substring.
+        def override_master_platform = false
+        for (platform in platforms) {
+            if (platform.contains(non_python_pkg_platform)) {
+                override_master_platform = true
+                break
             }
         }
-        println("master_platforms: ${master_platforms}")
+
+        if (override_master_platform) {
+            for (platform in platforms) {
+                if (platform.contains(non_python_pkg_platform)) {
+                    master_platforms.add(platform)
+                }
+            }
+            println("Automatic master_platforms overridden by job parameter." +
+                    " Building non-python packages only on master_platforms: ${master_platforms}")
+        else {
+            // Compose automatic list of master platforms.
+            def master_platforms = []
+            for (osval in os_list) {
+                for (platform in platforms) {
+                    if (platform.contains(osval)) {
+                        master_platforms.add(platform)
+                        break
+                    }
+                }
+            }
+            println("Building non-python packages only on master_platforms: ${master_platforms}")
+        }
+
 
         for (platform in platforms) {
             build_type = platform.tokenize("_")[0]
@@ -48,6 +70,7 @@ node('master') {
             if (master_platforms.contains(platname)) {
                 filter_nonpython = false
             }
+
             tasks["${platname}"] = {
                 build_objs["${platname}"] = build(
                     job: "/AstroConda/${platname}/_dispatch",
