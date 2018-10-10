@@ -37,7 +37,7 @@ node('master') {
             }
             println("Automatic master_platforms overridden by job parameter." +
                     " Building non-python packages only on master_platforms: ${master_platforms}")
-        else {
+        } else {
             // Compose automatic list of master platforms.
             def master_platforms = []
             for (osval in os_list) {
