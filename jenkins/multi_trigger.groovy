@@ -29,6 +29,7 @@ node('master') {
             }
         }
 
+        def master_platforms = []
         if (override_master_platform) {
             for (platform in platforms) {
                 if (platform.contains(non_python_pkg_platform)) {
@@ -39,7 +40,6 @@ node('master') {
                     " Building non-python packages only on master_platforms: ${master_platforms}")
         } else {
             // Compose automatic list of master platforms.
-            def master_platforms = []
             for (osval in os_list) {
                 for (platform in platforms) {
                     if (platform.contains(osval)) {
