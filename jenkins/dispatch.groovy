@@ -104,7 +104,12 @@ node(LABEL) {
       writeFile file: MANIFEST_FILE, text: manifest_data, encoding: "UTF-8"
     }
 
-    this.pins_file = readYaml file: "jenkins/${this.version_pins_file}"
+    // Check for existence of version pins file.
+    this.use_version_pins = 'false'
+    if (fileExists("jenkins/${this.version_pins_file}")) {
+        this.pins_file = readYaml file: "jenkins/${this.version_pins_file}"
+        this.use_version_pins = 'true'
+    }
 
     // Allow for sharing build_list between stages below.
     this.build_list = []
@@ -239,21 +244,12 @@ node(LABEL) {
             sh "patch ${filename} ${full_patchname}"
         }
 
-        // Determine if version_pins_file has a list of packages to pin.
-        try {
-            this.pins_file.packages
-            this.use_version_pins = "true"
-        } catch(MissingPropertyException) {
-            println("${this.version_pins_file} has no packages list, skipping pin environment creation.")
-            this.use_version_pins = "false"
-        }
-
         // (conda-build 3.x only)
         // Create and populate environment to be used for pinning reference when
         // building packages via the --bootstrap flag. Environment creation is done
         // using the explicit packages and versions in the pin file, with no
         // dependencies.
-        if (CONDA_BUILD_VERSION[0] == "3" && this.use_version_pins == "true") {
+        if (CONDA_BUILD_VERSION[0] == "3" && this.use_version_pins == 'true') {
             println("Creating environment based on package pin values found \n" +
             "in ${this.version_pins_file} to use as global version pinnning \n" +
             "specification. Packages to be installed in pin environment:")
