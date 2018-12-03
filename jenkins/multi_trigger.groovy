@@ -113,7 +113,8 @@ node('master') {
         // Compose status summary. Send mail if recipients have been specified.
         platcount = build_objs.size()
         successes = 0
-        build_objs.each {
+        def sorted_build_objs = build_objs.sort()
+        sorted_build_objs.each {
             key, value ->
                 if (value.result == "SUCCESS") {
                     successes++
