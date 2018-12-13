@@ -368,8 +368,18 @@ node(LABEL) {
             }
             if (tries_remaining != 0) {
                 sh(script: "touch ${lockfile}")
+                def index_cmd = "conda index"
+                def version_vals = []
+                CONDA_BUILD_VERSION.tokenize('.').each { value -> version_vals.add(value.toInteger()) }
+                // Conda build 3.15.1 introduces new index command options and behavior.
+                if (version_vals[1] >= 15) {
+                    index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
+                } else {
+                    index_cmd = "${index_cmd} ${publication_path}"
+                }
+                // Update index of conda channel platform directory.
                 dir(this.conda_build_output_dir) {
-                    sh(script: "conda index ${publication_path}")
+                    sh(script: "time ${index_cmd}")
                 }
                 sh(script: "rm -f ${lockfile}")
             }
