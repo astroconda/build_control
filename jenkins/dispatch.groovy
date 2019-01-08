@@ -52,6 +52,7 @@ node(LABEL) {
     // The directory deleted is the one named after the jenkins pipeline job.
     deleteDir()
 
+
     this.OSname = null
     def uname = sh(script: "uname", returnStdout: true).trim()
     if (uname == "Darwin") {
@@ -103,6 +104,12 @@ node(LABEL) {
     dir("manifests") {
       writeFile file: MANIFEST_FILE, text: manifest_data, encoding: "UTF-8"
     }
+
+    // Delete any existing indexing lockfile which may have
+    // been left behind by a previously aborted job.
+    this.publication_path = "${this.manifest.publication_root}/${this.CONDA_PLATFORM}"
+    this.lockfile = "${publication_path}/LOCK-Jenkins"
+    sh(script: "rm ${this.lockfile}", returnStatus: true)
 
     // Check for existence of version pins file.
     this.use_version_pins = 'false'
@@ -343,7 +350,7 @@ node(LABEL) {
     }
 
     stage ("Publish") {
-        def publication_path = "${this.manifest.publication_root}/${this.CONDA_PLATFORM}"
+        ////def publication_path = "${this.manifest.publication_root}/${this.CONDA_PLATFORM}"
         // Copy and index packages if any were produced in the build.
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
@@ -354,20 +361,20 @@ node(LABEL) {
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
             def tries_remaining = this.max_publication_tries
-            def lockfile = "${publication_path}/LOCK-Jenkins"
-            if ( fileExists(lockfile) ) {
+            ////def lockfile = "${publication_path}/LOCK-Jenkins"
+            if ( fileExists(this.lockfile) ) {
                 println("Lockfile already exists, waiting for it to be released...")
                 while ( tries_remaining > 0) {
                     println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
                     sleep(this.publication_lock_wait_s)
-                    if ( !fileExists(lockfile) ) {
+                    if ( !fileExists(this.lockfile) ) {
                         break
                     }
                     tries_remaining--
                 }
             }
             if (tries_remaining != 0) {
-                sh(script: "touch ${lockfile}")
+                sh(script: "touch ${this.lockfile}")
                 def index_cmd = "conda index"
                 def version_vals = []
                 CONDA_BUILD_VERSION.tokenize('.').each { value -> version_vals.add(value.toInteger()) }
