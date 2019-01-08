@@ -52,7 +52,6 @@ node(LABEL) {
     // The directory deleted is the one named after the jenkins pipeline job.
     deleteDir()
 
-
     this.OSname = null
     def uname = sh(script: "uname", returnStdout: true).trim()
     if (uname == "Darwin") {
@@ -350,7 +349,6 @@ node(LABEL) {
     }
 
     stage ("Publish") {
-        ////def publication_path = "${this.manifest.publication_root}/${this.CONDA_PLATFORM}"
         // Copy and index packages if any were produced in the build.
         def artifacts_present =
             sh(script: "ls ${this.conda_build_output_dir}/*.tar.bz2 >/dev/null 2>&1",
@@ -361,7 +359,6 @@ node(LABEL) {
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
             def tries_remaining = this.max_publication_tries
-            ////def lockfile = "${publication_path}/LOCK-Jenkins"
             if ( fileExists(this.lockfile) ) {
                 println("Lockfile already exists, waiting for it to be released...")
                 while ( tries_remaining > 0) {
