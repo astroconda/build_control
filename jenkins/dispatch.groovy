@@ -356,37 +356,43 @@ node(LABEL) {
         def rsync_cmd = "rsync -avzr"
         if (artifacts_present == 0) {
             sh(script: "${rsync_cmd} ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
+
+            // Test a single index per OS. Avoid collision mitigation for now.
+            if ("${PY_VERSION}" == "3.7" && this.CONDA_PLATFORM == "linux-64") {
+                index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
+                sh(script: "time ${index_cmd}")
+            }
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
-            def tries_remaining = this.max_publication_tries
-            if ( fileExists(this.lockfile) ) {
-                println("Lockfile already exists, waiting for it to be released...")
-                while ( tries_remaining > 0) {
-                    println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
-                    sleep(this.publication_lock_wait_s)
-                    if ( !fileExists(this.lockfile) ) {
-                        break
-                    }
-                    tries_remaining--
-                }
-            }
-            if (tries_remaining != 0) {
-                sh(script: "touch ${this.lockfile}")
-                def index_cmd = "conda index"
-                def version_vals = []
-                CONDA_BUILD_VERSION.tokenize('.').each { value -> version_vals.add(value.toInteger()) }
-                // Conda build 3.15.1 introduces new index command options and behavior.
-                if (version_vals[1] >= 15) {
-                    index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
-                } else {
-                    index_cmd = "${index_cmd} ${publication_path}"
-                }
-                // Update index of conda channel platform directory.
-                dir(this.conda_build_output_dir) {
-                    sh(script: "time ${index_cmd}")
-                }
-                sh(script: "rm -f ${lockfile}")
-            }
+            ////def tries_remaining = this.max_publication_tries
+            ////if ( fileExists(this.lockfile) ) {
+            ////    println("Lockfile already exists, waiting for it to be released...")
+            ////    while ( tries_remaining > 0) {
+            ////        println("Waiting ${this.publication_lock_wait_s}s for lockfile release...")
+            ////        sleep(this.publication_lock_wait_s)
+            ////        if ( !fileExists(this.lockfile) ) {
+            ////            break
+            ////        }
+            ////        tries_remaining--
+            ////    }
+            ////}
+            ////if (tries_remaining != 0) {
+            ////    sh(script: "touch ${this.lockfile}")
+            ////    def index_cmd = "conda index"
+            ////    def version_vals = []
+            ////    CONDA_BUILD_VERSION.tokenize('.').each { value -> version_vals.add(value.toInteger()) }
+            ////    // Conda build 3.15.1 introduces new index command options and behavior.
+            ////    if (version_vals[1] >= 15) {
+            ////        index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
+            ////    } else {
+            ////        index_cmd = "${index_cmd} ${publication_path}"
+            ////    }
+            ////    // Update index of conda channel platform directory.
+            ////    dir(this.conda_build_output_dir) {
+            ////        sh(script: "time ${index_cmd}")
+            ////    }
+            ////    sh(script: "rm -f ${lockfile}")
+            ////}
         } else {
             println("No build artifacts found.")
         }
