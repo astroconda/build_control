@@ -358,11 +358,13 @@ node(LABEL) {
             sh(script: "${rsync_cmd} ${this.conda_build_output_dir}/*.tar.bz2 ${publication_path}")
 
             // Test a single index per OS. Avoid collision mitigation for now.
-            //if ("${PY_VERSION}" == "3.7" && this.CONDA_PLATFORM == "linux-64") {
-            //    def index_cmd = "conda index"
-            //    index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
-            //    sh(script: "time ${index_cmd}")
-            //}
+            if ("${PY_VERSION}" == "3.7" && this.CONDA_PLATFORM == "linux-64") {
+                def index_cmd = "conda index"
+                sh(script: "date")
+                sh(script: "hostname")
+                index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
+                sh(script: "time ${index_cmd}")
+            }
 
             // Use a lock file to prevent two dispatch jobs that finish at the same
             // time from trampling each other's indexing process.
