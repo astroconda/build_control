@@ -359,6 +359,7 @@ node(LABEL) {
 
             // Test a single index per OS. Avoid collision mitigation for now.
             if ("${PY_VERSION}" == "3.7" && this.CONDA_PLATFORM == "linux-64") {
+                def index_cmd = "conda index"
                 index_cmd = "${index_cmd} -t 4 --no-progress --subdir ${this.CONDA_PLATFORM} ${this.manifest.publication_root}"
                 sh(script: "time ${index_cmd}")
             }
