@@ -198,7 +198,7 @@ node(LABEL) {
             CONDA_BASE_URL = [0..-2]
         }
         def dl_cmds = ["wget --no-verbose --server-response --no-check-certificate",
-                       "curl -OSs"]
+                       "curl -LOSs"]
         def dl_cmd = null
         def stat1 = 999
         for (cmd in dl_cmds) {
